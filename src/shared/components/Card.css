@@ -1,0 +1,66 @@
+/**
+ * Card Styles
+ * Neo-brutalist with bold personality
+ */
+
+.card {
+  background: var(--color-bg-elevated);
+  border: 2px solid var(--color-border);
+  border-radius: 0;
+  transition: all 0.1s ease;
+}
+
+/* === VARIANTS === */
+.card-elevated {
+  box-shadow: var(--shadow-md);
+}
+
+.card-outlined {
+  background: transparent;
+}
+
+.card-flat {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.card-surface {
+  background-color: var(--color-surface);
+}
+
+.card-glow {
+  box-shadow: var(--shadow-glow);
+}
+
+/* === PADDING === */
+.card-p-none {
+  padding: 0;
+}
+
+.card-p-sm {
+  padding: var(--space-4);
+}
+
+.card-p-md {
+  padding: var(--space-6);
+}
+
+.card-p-lg {
+  padding: var(--space-8);
+}
+
+/* === INTERACTIVE === */
+.card-clickable {
+  cursor: pointer;
+}
+
+.card-clickable:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 6px 6px 0 var(--color-border);
+}
+
+.card-clickable:active {
+  transform: translate(0, 0);
+  box-shadow: var(--shadow-xs);
+}

@@ -1,0 +1,199 @@
+/**
+ * KanbanBoard Styles
+ */
+
+.kanban-board {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.kanban-row {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.kanban-row-primary {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.kanban-row-secondary {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+@media (max-width: 1200px) {
+  .kanban-row-primary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .kanban-row-secondary {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .kanban-row-primary,
+  .kanban-row-secondary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .kanban-row-primary,
+  .kanban-row-secondary {
+    grid-template-columns: 1fr;
+  }
+}
+
+.kanban-column {
+  background: var(--color-bg);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  min-height: 400px;
+  transition: background var(--transition-fast);
+}
+
+.kanban-column.drag-over {
+  background: var(--color-accent-light);
+  border-color: var(--color-accent);
+}
+
+.column-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-3);
+  border-bottom: 3px solid var(--color-text);
+  background: var(--color-surface);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+
+.column-title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.column-count {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-muted);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+  min-width: 20px;
+  text-align: center;
+}
+
+.column-cards {
+  flex: 1;
+  padding: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  overflow-y: auto;
+}
+
+/* Kanban Card */
+.kanban-card {
+  background: var(--color-surface);
+  border: var(--border-width) solid var(--color-text);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  cursor: grab;
+  transition: all var(--transition-fast);
+}
+
+.kanban-card:hover {
+  box-shadow: var(--shadow-offset-sm);
+}
+
+.kanban-card.dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+}
+
+.kanban-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-1);
+}
+
+.kanban-company {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.kanban-score {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-surface);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+}
+
+.kanban-role {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.kanban-location {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-light);
+  margin: var(--space-1) 0 0 0;
+}
+
+/* Contact Tags */
+.kanban-contacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-top: var(--space-2);
+}
+
+.contact-tag {
+  font-size: var(--font-size-xs);
+  padding: var(--space-1) var(--space-2);
+  background: var(--color-primary-light);
+  border-radius: var(--radius-full);
+}
+
+.contact-more {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-light);
+}
+
+.contact-linkedin-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: var(--space-1);
+  width: 14px;
+  height: 14px;
+  font-size: 9px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-surface);
+  background: #0077B5;
+  border-radius: 2px;
+}
+
+/* Empty Column */
+.column-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-light);
+  font-size: var(--font-size-sm);
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-sm);
+  margin: var(--space-2);
+}

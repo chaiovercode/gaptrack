@@ -1,0 +1,255 @@
+/**
+ * FunnelView Styles (Sankey Tree Layout)
+ * Hierarchy: Root -> Status -> Location -> Work Type -> Jobs
+ */
+
+.sankey-view {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  padding: var(--space-8);
+  /* The layout grows horizontally essentially infinite */
+  overflow: auto;
+  min-height: 600px;
+  background: var(--color-bg);
+}
+
+.sankey-svg-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  /* Ideally this should track scrollWidth, but simple 100% works if container grows */
+  min-width: 100%;
+  height: 100%;
+  min-height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: visible;
+}
+
+.sankey-path {
+  fill: none;
+  transition: d 0.4s cubic-bezier(0.4, 0, 0.2, 1), stroke-width 0.3s ease;
+  stroke-opacity: 0.4;
+}
+
+.sankey-path:hover {
+  stroke-opacity: 0.8;
+}
+
+/* --- Columns / Layout --- */
+.sankey-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  /* Gap between statuses in the first column */
+  z-index: 1;
+  position: relative;
+  /* Root column margin */
+  margin-right: 160px;
+  /* Space for Root->Status links */
+}
+
+/* Root Node */
+.root-node {
+  background: var(--color-primary);
+  border: 2px solid var(--color-primary);
+  color: white;
+  padding: var(--space-4) var(--space-6);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  box-shadow: var(--shadow-lg);
+  cursor: default;
+}
+
+.root-node .node-count {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: white;
+}
+
+.root-node .node-label {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* --- Nested Branches --- */
+
+/* 
+  Structure:
+  .sankey-branch-group (Status & its children)
+      -> button.status-node
+      -> .sankey-sub-branch (Locations list)
+*/
+
+.sankey-branch-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 160px;
+  /* Horizontal Gap: Status -> Location */
+  position: relative;
+}
+
+/* Sub-branch is the vertical list of the NEXT level items */
+.sankey-sub-branch {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  /* Use padding to center-align the subtree relative to the parent? 
+     No, top-align is standard for expandable trees. */
+}
+
+.sankey-leaf-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 120px;
+  /* Horizontal Gap: Location -> WorkType, WorkType -> Jobs */
+}
+
+/* Node Shared Styles */
+.sankey-node {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 200px;
+  position: relative;
+  box-shadow: var(--shadow-sm);
+  flex-shrink: 0;
+  /* Prevent squishing */
+}
+
+.sankey-node:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary);
+}
+
+.sankey-node.expanded {
+  border-color: var(--color-primary);
+  background: var(--color-bg-elevated);
+  box-shadow: var(--shadow-md);
+  z-index: 2;
+  /* Bring above spacing */
+}
+
+/* Labels */
+.node-label {
+  flex: 1;
+  font-weight: 500;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.node-count-badge {
+  background: var(--color-bg);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+}
+
+.node-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Specific Node Types */
+.status-node {
+  border-left: 4px solid var(--node-color);
+}
+
+.location-node {
+  /* Location usually doesn't have a color, unless mapped. Use icon? */
+}
+
+.type-node {
+  border-left: 4px solid var(--node-color);
+}
+
+/* --- Job Cards --- */
+.sankey-jobs-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 260px;
+  flex-shrink: 0;
+  /* Animate in */
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.sankey-job-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.sankey-job-card:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.job-role {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--color-text);
+  margin-bottom: 2px;
+}
+
+.job-company {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.job-score {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+/* Empty State */
+.mindmap-empty {
+  /* Legacy support or reused */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8);
+  font-size: 1.1rem;
+  color: var(--color-text-muted);
+  text-align: center;
+  width: 100%;
+}

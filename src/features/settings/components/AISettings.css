@@ -1,0 +1,188 @@
+/**
+ * AI Settings Styles
+ */
+
+/* Settings Page Wrapper */
+.settings-page {
+  width: 100%;
+}
+
+.settings-page .ai-settings {
+  background: var(--color-bg-elevated);
+  border: 2px solid var(--color-border);
+  padding: var(--space-6);
+  max-width: 100%;
+}
+
+.settings-page .ai-settings h3 {
+  font-size: var(--font-size-2xl);
+  margin-bottom: var(--space-6);
+}
+
+.ai-settings {
+  max-width: 100%;
+}
+
+/* Provider Cards */
+.provider-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.provider-card {
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.provider-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-offset);
+}
+
+.provider-card.selected {
+  border-color: var(--color-accent);
+  background-color: var(--color-accent-light);
+}
+
+.provider-badge {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  padding: var(--space-1) var(--space-2);
+  background: var(--color-text);
+  color: var(--color-surface);
+  border-radius: var(--radius-sm);
+}
+
+.provider-badge.local {
+  background: var(--color-success);
+}
+
+/* Ollama Status */
+.ollama-status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-border);
+  font-size: var(--font-size-sm);
+}
+
+.ollama-status.running {
+  background: rgba(74, 222, 128, 0.2);
+}
+
+.ollama-status.not-running {
+  background: rgba(248, 113, 113, 0.2);
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-success);
+  flex-shrink: 0;
+}
+
+.status-dot.offline {
+  background: var(--color-error);
+}
+
+/* Model Buttons */
+.model-btn {
+  padding: var(--space-2) var(--space-4);
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  background: var(--color-surface);
+  border: var(--border-width) solid var(--color-text);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.model-btn:hover {
+  background: var(--color-border);
+}
+
+.model-btn.selected {
+  background: var(--color-text);
+  color: var(--color-surface);
+}
+
+/* Setup Instructions */
+.setup-instructions {
+  background: var(--color-accent-light);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  border: var(--border-width) solid var(--color-text);
+}
+
+.setup-instructions ol {
+  list-style: none;
+  padding: 0;
+}
+
+.setup-instructions li {
+  margin-bottom: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.step-label {
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Model Suggestions */
+.model-suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.suggestion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-2);
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: var(--radius-sm);
+}
+
+/* No Models Warning */
+.no-models-warning {
+  padding: var(--space-3);
+  background: rgba(248, 113, 113, 0.2);
+  border-radius: var(--radius-md);
+  border: var(--border-width) solid var(--color-error);
+}
+
+/* Selected Model Display */
+.selected-model {
+  display: flex;
+  align-items: center;
+  padding: var(--space-3);
+  background: rgba(74, 222, 128, 0.2);
+  border-radius: var(--radius-md);
+}
+
+/* Code blocks */
+code {
+  font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+  font-size: var(--font-size-sm);
+  background: rgba(0, 0, 0, 0.1);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+}
+
+/* Utility */
+.ml-auto {
+  margin-left: auto;
+}
+
+.ml-2 {
+  margin-left: var(--space-2);
+}

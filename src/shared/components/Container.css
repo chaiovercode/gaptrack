@@ -1,0 +1,28 @@
+/**
+ * Container Styles
+ */
+
+.container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--container-padding);
+  padding-right: var(--container-padding);
+}
+
+/* === SIZES === */
+.container-sm {
+  max-width: 640px;
+}
+
+.container-default {
+  max-width: var(--container-max);
+}
+
+.container-lg {
+  max-width: 1400px;
+}
+
+.container-full {
+  max-width: 100%;
+}

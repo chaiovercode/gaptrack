@@ -1,0 +1,117 @@
+/**
+ * Toast Styles
+ * Notification popups - Nano Banana Pro inspired
+ */
+
+/* Container - positions toasts at top-right */
+.toast-container {
+  position: fixed;
+  top: var(--space-4);
+  right: var(--space-4);
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-width: 400px;
+}
+
+/* Toast */
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-surface);
+  border: var(--border-width-thick) solid var(--color-text);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-offset);
+  animation: slideIn var(--transition-fast);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Icon */
+.toast-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Message */
+.toast-message {
+  flex: 1;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Close Button */
+.toast-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-light);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.toast-close:hover {
+  color: var(--color-text);
+}
+
+/* Variants */
+.toast-success {
+  border-color: var(--color-success);
+}
+
+.toast-success .toast-icon {
+  background-color: var(--color-success);
+  color: white;
+}
+
+.toast-error {
+  border-color: var(--color-error);
+}
+
+.toast-error .toast-icon {
+  background-color: var(--color-error);
+  color: white;
+}
+
+.toast-warning {
+  border-color: var(--color-warning);
+}
+
+.toast-warning .toast-icon {
+  background-color: var(--color-warning);
+  color: var(--color-text);
+}
+
+.toast-info {
+  border-color: var(--color-accent);
+}
+
+.toast-info .toast-icon {
+  background-color: var(--color-accent);
+  color: var(--color-text);
+}

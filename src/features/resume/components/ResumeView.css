@@ -1,0 +1,239 @@
+/**
+ * Resume View Styles
+ * Display parsed resume data
+ */
+
+/* Resume Card */
+.resume-view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* Header with name and contact */
+.resume-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.resume-name {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  margin: 0;
+}
+
+.resume-contact {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-size: var(--font-size-sm);
+  text-align: right;
+}
+
+.resume-contact span {
+  color: var(--color-text-light);
+}
+
+/* Summary */
+.resume-summary {
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  padding: var(--space-4);
+  background: var(--color-accent-light);
+  border-radius: var(--radius-md);
+  font-style: italic;
+}
+
+/* Section */
+.resume-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.resume-section-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding-bottom: var(--space-2);
+  border-bottom: var(--border-width-thick) solid var(--color-text);
+  margin: 0;
+}
+
+/* Skills */
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-4);
+}
+
+.skill-category {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.skill-category-title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  color: var(--color-text-light);
+}
+
+.skill-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.skill-tag {
+  display: inline-block;
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  background: var(--color-surface);
+  border: var(--border-width) solid var(--color-text);
+  border-radius: var(--radius-sm);
+}
+
+.skill-tag.technical {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.skill-tag.tools {
+  border-color: var(--color-accent);
+  background: var(--color-accent-light);
+}
+
+/* Experience */
+.experience-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.experience-item {
+  padding: var(--space-4);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.experience-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.experience-title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+  margin: 0;
+}
+
+.experience-company {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-light);
+}
+
+.experience-duration {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-light);
+  text-align: right;
+}
+
+.experience-highlights {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.experience-highlights li {
+  position: relative;
+  padding-left: var(--space-4);
+  margin-bottom: var(--space-2);
+  font-size: var(--font-size-sm);
+}
+
+.experience-highlights li::before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: var(--color-primary);
+  font-weight: bold;
+}
+
+/* Education */
+.education-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.education-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.education-degree {
+  font-weight: var(--font-weight-bold);
+}
+
+.education-school {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-light);
+}
+
+.education-year {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-light);
+}
+
+/* Certifications */
+.cert-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.cert-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-sm);
+  background: var(--color-success-light);
+  border: var(--border-width) solid var(--color-success);
+  border-radius: var(--radius-sm);
+}
+
+.cert-tag::before {
+  content: "✓";
+  color: var(--color-success);
+  font-weight: bold;
+}
+
+/* Actions */
+.resume-actions {
+  display: flex;
+  gap: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: var(--border-width) solid var(--color-border);
+}
+
+/* Empty state */
+.resume-empty {
+  text-align: center;
+  padding: var(--space-8);
+  color: var(--color-text-light);
+}

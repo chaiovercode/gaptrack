@@ -1,0 +1,72 @@
+/**
+ * Input Styles
+ * Neo-brutalist with bold personality
+ */
+
+.input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.input-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.input {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  background: var(--color-bg-elevated);
+  border: 2px solid var(--color-border);
+  border-radius: 0;
+  transition: all 0.1s ease;
+}
+
+.input:hover:not(:disabled):not(:focus) {
+  background: var(--color-surface);
+}
+
+.input:focus {
+  outline: none;
+  box-shadow: var(--shadow-sm);
+  transform: translate(-2px, -2px);
+}
+
+.input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.input:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* === ERROR STATE === */
+.input-error {
+  border-color: var(--color-error);
+  background: var(--color-error-light);
+}
+
+.input-error:focus {
+  border-color: var(--color-error);
+  box-shadow: 3px 3px 0 var(--color-error);
+}
+
+.input-error-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-error);
+  font-weight: var(--font-weight-bold);
+}
+
+/* === HELPER TEXT === */
+.input-helper {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}

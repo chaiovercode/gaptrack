@@ -1,0 +1,118 @@
+/**
+ * SetupLayout Styles
+ */
+
+.setup-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg);
+}
+
+/* Navbar */
+.setup-nav {
+  background: var(--color-bg);
+  border-bottom: 3px solid var(--color-border);
+}
+
+.setup-nav-inner {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-6);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.setup-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.setup-logo-img {
+  height: 48px;
+  width: auto;
+  background: transparent;
+}
+
+.setup-logo-text {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+  letter-spacing: -0.02em;
+}
+
+.setup-back-btn {
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-surface-solid);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  border: 2px solid var(--color-border);
+  box-shadow: var(--shadow-xs);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.setup-back-btn:hover {
+  background: var(--color-surface);
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 var(--color-border);
+}
+
+/* Main Content */
+.setup-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--space-8) var(--space-6);
+}
+
+/* Footer */
+.setup-footer {
+  background: var(--color-surface);
+  border-top: 3px solid var(--color-border);
+  padding: var(--space-4) var(--space-6);
+}
+
+.setup-footer-inner {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.setup-footer p {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.setup-footer-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  transition: color var(--transition-fast);
+}
+
+.setup-footer-link:hover {
+  color: var(--color-primary);
+}
+
+.setup-footer-link svg {
+  flex-shrink: 0;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .setup-footer-inner {
+    flex-direction: column;
+    text-align: center;
+  }
+}

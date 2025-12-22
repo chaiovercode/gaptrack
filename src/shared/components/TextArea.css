@@ -1,0 +1,59 @@
+/**
+ * TextArea Styles
+ * Nano Banana Pro inspired - thick black borders
+ */
+
+.textarea-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.textarea-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+}
+
+.textarea {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  border: var(--border-width-thick) solid var(--color-text);
+  border-radius: var(--radius-sm);
+  resize: vertical;
+  min-height: 100px;
+  transition: all var(--transition-fast);
+}
+
+.textarea:focus {
+  outline: none;
+  box-shadow: var(--shadow-offset-sm);
+}
+
+.textarea::placeholder {
+  color: var(--color-text-light);
+}
+
+.textarea:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* === ERROR STATE === */
+.textarea-error {
+  border-color: var(--color-error);
+}
+
+.textarea-error:focus {
+  border-color: var(--color-error);
+}
+
+.textarea-error-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-error);
+  font-weight: var(--font-weight-medium);
+}
