@@ -362,7 +362,7 @@
   padding: var(--space-2);
   font-size: var(--font-size-sm);
   font-family: var(--font-family);
-  background: #fff;
+  background: var(--color-surface);
   border: 2px solid var(--color-border);
   color: var(--color-text);
   transition: border-color var(--transition-fast);
@@ -379,7 +379,7 @@
 
 /* Editing state for existing rows */
 .contact-row.editing {
-  background: var(--color-accent-light);
+  background: var(--color-primary-light);
 }
 
 .contact-row.editing .editable-cell {
@@ -387,7 +387,7 @@
   padding: var(--space-2);
   font-size: var(--font-size-sm);
   font-family: var(--font-family);
-  background: #fff;
+  background: var(--color-surface);
   border: 2px solid var(--color-border);
   color: var(--color-text);
 }
@@ -552,7 +552,7 @@
   padding: var(--space-2);
   font-size: var(--font-size-sm);
   font-family: var(--font-family);
-  background: #fff;
+  background: var(--color-surface);
   border: 2px solid var(--color-border);
   color: var(--color-text);
   cursor: pointer;
@@ -590,7 +590,7 @@
   top: calc(100% + 2px);
   left: 0;
   min-width: 160px;
-  background: #fff;
+  background: var(--color-surface);
   border: 2px solid var(--color-text);
   max-height: 240px;
   overflow-y: auto;
@@ -613,11 +613,11 @@
 }
 
 .custom-dropdown-option:hover {
-  background: var(--color-accent-light);
+  background: var(--color-surface-hover);
 }
 
 .custom-dropdown-option.selected {
-  background: var(--color-accent);
+  background: var(--color-primary-light);
   font-weight: var(--font-weight-bold);
 }
 
@@ -660,7 +660,7 @@
   align-items: center;
   padding: var(--space-4) var(--space-5);
   border-bottom: 3px solid var(--color-text);
-  background: var(--color-accent);
+  background: var(--color-primary);
 }
 
 .contact-detail-header h2 {
@@ -730,7 +730,7 @@
 }
 
 .detail-value a:hover {
-  background: var(--color-accent);
+  background: var(--color-primary-light);
 }
 
 .detail-notes {
@@ -916,11 +916,11 @@
 }
 
 .modal-dropdown-option:hover {
-  background: var(--color-accent-light);
+  background: var(--color-surface-hover);
 }
 
 .modal-dropdown-option.selected {
-  background: var(--color-accent);
+  background: var(--color-primary-light);
   font-weight: var(--font-weight-bold);
 }
 

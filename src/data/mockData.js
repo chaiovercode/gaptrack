@@ -1,53 +1,54 @@
 /**
  * Mock data for demo mode
- * User: Janardan Jakhar - Full Stack Developer
+ * User: Elliot Alderson - Cybersecurity Engineer
+ * "Hello, friend."
  */
 
 // Mock analysis results for demo mode
 export const MOCK_ANALYSIS = {
   normal: {
     mode: 'normal',
-    score: 78,
-    summary: 'Your resume presents a solid full-stack developer profile with strong JavaScript/React expertise. There are opportunities to better highlight leadership experience and quantify achievements.',
+    score: 89,
+    summary: 'analysis complete. subject demonstrates high-level offensive security capabilities. experience at allsafe provides adequate cover. technical proficiency in penetration testing is absolute. social skills are the primary vector for potential failure.',
     strengths: [
-      'Strong technical foundation in JavaScript, TypeScript, and React',
-      'Clear progression from junior to senior roles',
-      'Good mix of startup and agency experience',
-      'Relevant certifications (AWS, GCP) add credibility'
+      'root access level mastery of linux/unix systems',
+      'ability to bypass enterprise-grade firewalls undetected',
+      'custom exploit development (python/ruby/assembly)',
+      'strong understanding of physical security protocols'
     ],
     improvements: [
-      'Add more quantified achievements (revenue impact, user growth, etc.)',
-      'Include more keywords for ATS optimization',
-      'Expand on leadership and mentoring experience',
-      'Consider adding a projects or portfolio section'
+      'subject appears visibly anxious in corporate settings',
+      'resume lacks "team player" buzzwords required by hr filters',
+      'gaps in employment history correlate with "sick days"',
+      'references are limited to gideon goddard and childhood friend'
     ],
     tips: [
-      'Lead with impact metrics in each bullet point',
-      'Tailor skills section to match job descriptions',
-      'Add links to GitHub, portfolio, or notable projects',
-      'Consider a brief professional summary at the top'
+      'mimic their language. use words like "synergy" and "deliverables"',
+      'hide the anxiety. they can smell it.',
+      'quantify "saved" revenue. they only care about money.',
+      'do not mention specific hacks. keep it vague. keep it safe.'
     ]
   },
   roast: {
     mode: 'roast',
-    score: 52,
-    summary: 'Oh look, another "Full Stack Developer" who lists every technology they\'ve ever Googled. Your resume reads like a Wikipedia article for web development buzzwords.',
+    score: 12,
+    summary: 'this resume screams "i operate in the shadows" which translates to "i am a liability" for any hr department. you listed "social engineering" as a skill? are you trying to get arrested or hired? the hoodie picture was a nice touch if you are applying to a hackathon, not a bank.',
     strengths: [
-      'At least you spelled JavaScript correctly',
-      'You managed to stay employed, which is... something',
-      'The certifications show you can pass a multiple choice test'
+      'technical skills are undeniable (if they verify them)',
+      'allsafe tenure looks respectable on paper',
+      'you didn\'t list "mr. robot" as a reference'
     ],
     improvements: [
-      '"Built full-stack web applications" - wow, so did every bootcamp grad in 2019',
-      '"Reduced page load time by 40%" - from what, 10 seconds to 6? Still terrible.',
-      'Your skills list is longer than your actual experience descriptions',
-      '"Collaborated with design team" - you mean you argued about button colors?'
+      '"self-taught" sounds like "unmanageable" to a recruiter',
+      'your github is empty (smart, but suspicious)',
+      'you look sleep-deprived in your photo. corporate wants "energetic slaves"',
+      'summary reads like a manifesto, not a professional bio'
     ],
     tips: [
-      'Stop listing technologies like you\'re a human package.json',
-      'Actually explain what you built instead of vague corporate speak',
-      'One really impressive project beats ten forgettable ones',
-      'Maybe lead with something more exciting than "Senior Software Engineer"'
+      'delete "social engineering". call it "user security awareness"',
+      'pretend to care about their "culture". it is all a lie anyway.',
+      'get a haircut. look like one of them.',
+      'stop trying to save the world. just get the paycheck.'
     ]
   }
 }
@@ -56,234 +57,225 @@ export const MOCK_DATA = {
   applications: [
     {
       id: 'demo-1',
-      company: 'Google',
-      role: 'Senior Software Engineer',
-      location: 'Mountain View, CA',
-      status: 'interview',
-      workType: 'hybrid',
-      salary: '$180,000 - $250,000',
-      link: 'https://careers.google.com',
-      notes: 'Phone screen done. On-site scheduled for next week.',
-      matchScore: 87,
-      createdAt: '2024-12-01T10:00:00.000Z',
-      updatedAt: '2024-12-18T14:30:00.000Z'
-    },
-    {
-      id: 'demo-2',
-      company: 'Stripe',
-      role: 'Full Stack Engineer',
-      location: 'San Francisco, CA',
-      status: 'screening',
-      workType: 'remote',
-      salary: '$170,000 - $220,000',
-      link: 'https://stripe.com/jobs',
-      notes: 'Recruiter reached out on LinkedIn. Scheduled intro call.',
-      matchScore: 92,
-      createdAt: '2024-12-05T09:00:00.000Z',
-      updatedAt: '2024-12-15T11:00:00.000Z'
-    },
-    {
-      id: 'demo-3',
-      company: 'Airbnb',
-      role: 'Software Engineer, Frontend',
-      location: 'San Francisco, CA',
-      status: 'applied',
-      workType: 'hybrid',
-      salary: '$160,000 - $200,000',
-      link: 'https://careers.airbnb.com',
-      notes: 'Applied through referral from college friend.',
-      matchScore: 78,
-      createdAt: '2024-12-10T14:00:00.000Z',
-      updatedAt: '2024-12-10T14:00:00.000Z'
-    },
-    {
-      id: 'demo-4',
-      company: 'Notion',
-      role: 'Product Engineer',
+      company: 'Allsafe Cybersecurity',
+      role: 'Lead Security Analyst',
       location: 'New York, NY',
       status: 'offer',
-      workType: 'remote',
+      workType: 'hybrid',
       salary: '$165,000 - $195,000',
-      link: 'https://notion.so/careers',
-      notes: 'Offer received! $185k base + equity. Need to decide by Dec 28.',
-      matchScore: 95,
+      link: 'https://allsafe.com/careers',
+      notes: 'gideon is a good man. he cares. that makes him vulnerable. offer is good. perfect cover. i can monitor e corp from here.',
+      linkedContacts: ['contact-1', 'contact-4'],
+      gapAnalysis: {
+        matchScore: 99,
+        summary: 'perfect infiltration point. access granted.',
+        strengths: [
+          { skill: 'Penetration Testing', relevance: 'primary objective' },
+          { skill: 'E Corp Systems', relevance: 'target infrastructure access' },
+          { skill: 'Incident Response', relevance: 'cover for investigation' }
+        ],
+        gaps: [
+          { requirement: 'Social Interaction', suggestion: 'initiate "small talk" protocol' }
+        ]
+      },
       createdAt: '2024-11-20T08:00:00.000Z',
       updatedAt: '2024-12-20T16:00:00.000Z'
     },
     {
-      id: 'demo-5',
-      company: 'Figma',
-      role: 'Software Engineer',
-      location: 'San Francisco, CA',
-      status: 'rejected',
-      workType: 'hybrid',
-      salary: '$155,000 - $190,000',
-      link: 'https://figma.com/careers',
-      notes: 'Rejected after final round. Feedback: need more system design experience.',
-      matchScore: 72,
-      createdAt: '2024-11-15T10:00:00.000Z',
-      updatedAt: '2024-12-12T09:00:00.000Z'
+      id: 'demo-8',
+      company: 'E Corp',
+      role: 'InfoSec VP',
+      location: 'New York, NY',
+      status: 'withdrawn',
+      workType: 'onsite',
+      salary: '$350,000 - $500,000',
+      link: 'https://e-corp.com/careers',
+      notes: 'tyrell offered me a job. "join us". tempting. inside the belly of the beast. but too much exposure. had to decline. he didn\'t take it well.',
+      linkedContacts: ['contact-2', 'contact-3'],
+      gapAnalysis: {
+        matchScore: 45,
+        summary: 'high risk. high reward. ultimate trap.',
+        strengths: [
+          { skill: 'Technical Superiority', relevance: 'you are better than their entire team' }
+        ],
+        gaps: [
+          { requirement: 'Soul', suggestion: 'required to sell to the devil' },
+          { requirement: 'Compliance', suggestion: 'incapable of following blind orders' }
+        ]
+      },
+      createdAt: '2024-11-01T10:00:00.000Z',
+      updatedAt: '2024-11-05T08:00:00.000Z'
     },
     {
-      id: 'demo-6',
-      company: 'Vercel',
-      role: 'Senior Frontend Engineer',
-      location: 'Remote',
+      id: 'demo-2',
+      company: 'FBI',
+      role: 'Cyber Division Contractor',
+      location: 'Washington, DC',
       status: 'interview',
-      workType: 'remote',
-      salary: '$175,000 - $210,000',
-      link: 'https://vercel.com/careers',
-      notes: 'Technical interview completed. Waiting for team matching.',
-      matchScore: 88,
+      workType: 'onsite',
+      salary: '$120,000 - $150,000',
+      link: 'https://fbijobs.gov',
+      notes: 'dom dipierro suspects something. applying might throw them off... or put me on their radar. risky. need to leak the fsociety beat report first.',
+      gapAnalysis: {
+        matchScore: 88,
+        summary: 'surveillance state actors. dangerous territory.',
+        strengths: [
+          { skill: 'Forensics', relevance: 'you know how to hide' },
+          { skill: 'Dark Web', relevance: 'you live there' }
+        ],
+        gaps: [
+          { requirement: 'Background Check', suggestion: 'critical failure point. sanitize history.' },
+          { requirement: 'Drug Test', suggestion: 'detox required immediately' }
+        ]
+      },
       createdAt: '2024-12-03T11:00:00.000Z',
       updatedAt: '2024-12-19T10:00:00.000Z'
     },
     {
-      id: 'demo-7',
-      company: 'Linear',
-      role: 'Full Stack Developer',
-      location: 'Remote',
-      status: 'applied',
-      workType: 'remote',
-      salary: '$150,000 - $180,000',
-      link: 'https://linear.app/careers',
-      notes: 'Love their product! Applied directly on website.',
-      matchScore: 85,
-      createdAt: '2024-12-15T13:00:00.000Z',
-      updatedAt: '2024-12-15T13:00:00.000Z'
+      id: 'demo-3',
+      company: 'Theranos',
+      role: 'Security Consultant',
+      location: 'Palo Alto, CA',
+      status: 'rejected',
+      workType: 'onsite',
+      salary: '$0',
+      link: 'https://theranos.com',
+      notes: 'fraud. smoke and mirrors. their "tech" is a shell script. i saw through it in 5 minutes. they knew i knew.',
+      gapAnalysis: {
+        matchScore: 0,
+        summary: 'system error. do not proceed.',
+        strengths: [],
+        gaps: [
+          { requirement: 'Belief within Lies', suggestion: 'incompatible with logic' }
+        ]
+      },
+      createdAt: '2024-10-01T10:00:00.000Z',
+      updatedAt: '2024-10-02T14:30:00.000Z'
     },
     {
-      id: 'demo-8',
-      company: 'Shopify',
-      role: 'Senior Developer',
-      location: 'Toronto, Canada',
-      status: 'withdrawn',
+      id: 'demo-5',
+      company: 'Protonmail',
+      role: 'Cryptography Engineer',
+      location: 'Geneva, CH',
+      status: 'screening',
       workType: 'remote',
-      salary: '$140,000 - $175,000 CAD',
-      link: 'https://shopify.com/careers',
-      notes: 'Withdrew after receiving Notion offer.',
-      matchScore: 81,
-      createdAt: '2024-11-25T09:00:00.000Z',
-      updatedAt: '2024-12-21T08:00:00.000Z'
+      salary: '$170,000 - $210,000',
+      link: 'https://protonmail.com/careers',
+      notes: 'one of the few secure channels left. i use them. might as well work for them. privacy is a human right.',
+      gapAnalysis: {
+        matchScore: 91,
+        summary: 'ethical match. safe harbor.',
+        strengths: [
+          { skill: 'Cryptography', relevance: 'mathematical purity' },
+          { skill: 'Privacy', relevance: 'ideological alignment' }
+        ],
+        gaps: [
+          { requirement: 'Relocation', suggestion: 'switzerland is neutral. good for disappearing.' }
+        ]
+      },
+      createdAt: '2024-12-10T14:00:00.000Z',
+      updatedAt: '2024-12-16T10:00:00.000Z'
     }
   ],
   contacts: [
     {
       id: 'contact-1',
-      name: 'Sarah Chen',
-      company: 'Google',
-      role: 'Engineering Manager',
-      email: 'sarah.chen@example.com',
-      phone: '+1 (555) 123-4567',
-      linkedin: 'https://linkedin.com/in/sarahchen',
-      notes: 'Met at React Conf 2024. Very helpful with referral.',
+      name: 'Gideon Goddard',
+      company: 'Allsafe Cybersecurity',
+      role: 'CEO',
+      email: 'gideon@allsafe.com',
+      notes: 'too kind for this world. he suspects something is wrong with me. invited me to dinner. need to deflect.',
       createdAt: '2024-11-28T10:00:00.000Z',
       updatedAt: '2024-12-01T10:00:00.000Z'
     },
     {
       id: 'contact-2',
-      name: 'Mike Rodriguez',
-      company: 'Stripe',
-      role: 'Senior Recruiter',
-      email: 'mike.r@example.com',
-      phone: '+1 (555) 234-5678',
-      linkedin: 'https://linkedin.com/in/mikerodriguez',
-      notes: 'Reached out via LinkedIn. Quick to respond.',
+      name: 'Angela Moss',
+      company: 'E Corp',
+      role: 'Risk Management',
+      email: 'angela.moss@e-corp.com',
+      notes: 'friend. weakness. she is climbing the corporate ladder. she thinks she can change them. she is wrong.',
       createdAt: '2024-12-04T14:00:00.000Z',
       updatedAt: '2024-12-05T09:00:00.000Z'
     },
     {
       id: 'contact-3',
-      name: 'Emily Watson',
-      company: 'Notion',
-      role: 'Head of Engineering',
-      email: 'emily.w@example.com',
-      linkedin: 'https://linkedin.com/in/emilywatson',
-      notes: 'Final round interviewer. Great conversation about team culture.',
+      name: 'Tyrell Wellick',
+      company: 'E Corp',
+      role: 'CTO (acting)',
+      email: 'tyrell.wellick@e-corp.com',
+      notes: 'psychopath. unstable. obsessed with power. he knows i hacked them. why hasn\'t he turned me in? he wants to be partners.',
       createdAt: '2024-12-10T11:00:00.000Z',
       updatedAt: '2024-12-20T16:00:00.000Z'
     },
     {
       id: 'contact-4',
-      name: 'David Park',
-      company: 'Vercel',
-      role: 'Staff Engineer',
-      email: 'david.park@example.com',
-      linkedin: 'https://linkedin.com/in/davidpark',
-      notes: 'College alumni. Helped prep for technical interview.',
+      name: 'Darlene',
+      company: 'fsociety',
+      role: 'Root',
+      email: 'encrypted@protonmail.com',
+      notes: 'sister. contact point. keep professional distance in logs. delete this entry after reading.',
       createdAt: '2024-12-02T15:00:00.000Z',
       updatedAt: '2024-12-03T11:00:00.000Z'
     },
     {
       id: 'contact-5',
-      name: 'Lisa Thompson',
-      company: 'Airbnb',
-      role: 'Technical Recruiter',
-      email: 'lisa.t@example.com',
-      phone: '+1 (555) 345-6789',
-      notes: 'Referral from college friend. Waiting for her update.',
+      name: 'Whiterose',
+      company: 'Dark Army',
+      role: 'Leader',
+      email: 'admin@deus-group.cn',
+      notes: 'time is ticking. do not keep her waiting. dangerous.',
       createdAt: '2024-12-09T10:00:00.000Z',
       updatedAt: '2024-12-10T14:00:00.000Z'
     }
   ],
   resume: {
-    name: 'Janardan Jakhar',
-    email: 'janardan.jakhar@example.com',
-    phone: '+1 (555) 987-6543',
-    location: 'San Francisco, CA',
-    summary: 'Full Stack Developer with 5+ years of experience building scalable web applications. Passionate about clean code, great UX, and developer tools.',
+    name: 'Elliot Alderson',
+    email: 'elliot.alderson@protonmail.com',
+    phone: 'Unknown',
+    location: 'New York, NY',
+    summary: 'Senior cybersecurity engineer specializing in offensive security and intrusion detection. "White hat" hacker with a focus on enterprise infrastructure protection. I see the vulnerabilities others miss.',
     skills: [
-      { name: 'JavaScript', level: 'Expert' },
-      { name: 'TypeScript', level: 'Expert' },
-      { name: 'React', level: 'Expert' },
-      { name: 'Node.js', level: 'Advanced' },
-      { name: 'Python', level: 'Advanced' },
-      { name: 'PostgreSQL', level: 'Advanced' },
-      { name: 'AWS', level: 'Intermediate' },
-      { name: 'Docker', level: 'Intermediate' },
-      { name: 'GraphQL', level: 'Intermediate' },
-      { name: 'Redis', level: 'Intermediate' }
+      { name: 'Penetration Testing', level: 'Expert' },
+      { name: 'Python/Ruby', level: 'Expert' },
+      { name: 'Linux Kernel', level: 'Expert' },
+      { name: 'Social Engineering', level: 'Expert' },
+      { name: 'Cryptography', level: 'Advanced' },
+      { name: 'Malware Analysis', level: 'Advanced' },
+      { name: 'Data Recovery', level: 'Advanced' }
     ],
     experience: [
       {
-        title: 'Senior Software Engineer',
-        company: 'TechStartup Inc.',
-        startDate: '2022-01',
+        title: 'Senior Security Engineer',
+        company: 'Allsafe Cybersecurity',
+        startDate: '2014-09',
         endDate: 'Present',
-        description: 'Lead frontend architecture for SaaS platform serving 50k+ users. Reduced page load time by 40% through code splitting and optimization.'
+        description: 'Primary architect for E Corp security protocols. Responded to DDOS attacks. Conducted vulnerability assessments for high-profile clients.'
       },
       {
-        title: 'Software Engineer',
-        company: 'Digital Agency Co.',
-        startDate: '2019-06',
-        endDate: '2021-12',
-        description: 'Built full-stack web applications for Fortune 500 clients. Implemented CI/CD pipelines and automated testing.'
-      },
-      {
-        title: 'Junior Developer',
-        company: 'Web Solutions LLC',
-        startDate: '2018-01',
-        endDate: '2019-05',
-        description: 'Developed responsive websites and RESTful APIs. Collaborated with design team on UX improvements.'
+        title: 'Security Consultant',
+        company: 'Freelance',
+        startDate: '2012-06',
+        endDate: '2014-08',
+        description: 'Anonymous consulting for small businesses. Security hardening. Data recovery services.'
       }
     ],
     education: [
       {
-        degree: 'B.S. Computer Science',
-        school: 'UC Berkeley',
-        year: '2017'
+        degree: 'None',
+        school: 'Self-Taught',
+        year: 'Lifetime'
       }
     ],
     certifications: [
-      'AWS Certified Developer',
-      'Google Cloud Professional'
+      'None required'
     ],
     parsedAt: '2024-11-15T10:00:00.000Z'
   },
   settings: {
     aiProvider: 'gemini',
-    geminiApiKey: 'demo-key-not-real',
-    goalDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] // 14 days from now
+    geminiApiKey: 'demo-mode-bypass',
+    goalDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
   },
   updatedAt: new Date().toISOString()
 }

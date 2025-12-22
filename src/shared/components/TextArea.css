@@ -20,13 +20,14 @@
   padding: var(--space-3) var(--space-4);
   font-family: var(--font-family);
   font-size: var(--font-size-base);
-  color: var(--color-text);
-  background-color: var(--color-surface);
-  border: var(--border-width-thick) solid var(--color-text);
-  border-radius: var(--radius-sm);
+  color: var(--color-text) !important;
+  background-color: var(--color-surface) !important;
+  border: 2px solid var(--color-border);
+  border-radius: 0;
   resize: vertical;
   min-height: 100px;
   transition: all var(--transition-fast);
+  -webkit-text-fill-color: var(--color-text);
 }
 
 .textarea:focus {

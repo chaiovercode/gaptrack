@@ -31,19 +31,19 @@ export function createAIService(settings) {
   /**
    * Call the AI with a prompt (internal use)
    */
-  async function call(prompt) {
+  async function call(prompt, signal) {
     if (aiProvider === 'gemini') {
       if (!geminiApiKey) {
         return { success: false, error: 'Gemini API key not configured' }
       }
-      return callGemini(geminiApiKey, prompt)
+      return callGemini(geminiApiKey, prompt, signal)
     } else if (aiProvider === 'openai') {
       if (!openaiApiKey) {
         return { success: false, error: 'OpenAI API key not configured' }
       }
-      return callOpenAI(openaiApiKey, prompt)
+      return callOpenAI(openaiApiKey, prompt, signal)
     } else if (aiProvider === 'ollama') {
-      return callOllama(ollamaModel, prompt)
+      return callOllama(ollamaModel, prompt, signal)
     } else {
       return { success: false, error: 'No AI provider configured' }
     }
@@ -52,42 +52,48 @@ export function createAIService(settings) {
   /**
    * Parse JSON from AI response (handles various formats)
    */
+  /**
+   * Parse JSON from AI response (handles various formats)
+   */
   function parseJSON(text) {
     if (!text) return null
 
     let cleaned = text.trim()
 
-    // Try direct parse first
+    // 1. Try direct parse
     try {
       return JSON.parse(cleaned)
     } catch (e) {
       // Continue to other methods
     }
 
-    // Remove markdown code blocks (various formats)
-    cleaned = cleaned
-      .replace(/^```json\s*/i, '')
-      .replace(/^```\s*/i, '')
-      .replace(/\s*```$/i, '')
-      .trim()
-
-    try {
-      return JSON.parse(cleaned)
-    } catch (e) {
-      // Continue to extraction method
-    }
-
-    // Try to extract JSON object from text
-    const jsonMatch = text.match(/\{[\s\S]*\}/)
-    if (jsonMatch) {
+    // 2. Extract from markdown code blocks
+    // Match content between ```json and ```, or ``` and ```
+    const codeBlockMatch = cleaned.match(/```(?:json)?\s*([\s\S]*?)\s*```/i)
+    if (codeBlockMatch) {
       try {
-        return JSON.parse(jsonMatch[0])
+        return JSON.parse(codeBlockMatch[1])
       } catch (e) {
-        console.error('Failed to parse extracted JSON:', jsonMatch[0].substring(0, 200))
+        // If code block extraction worked but parsing failed, 
+        // update 'cleaned' to use the inner content for the next step (brace matching)
+        cleaned = codeBlockMatch[1].trim()
       }
     }
 
-    console.error('Could not parse AI response as JSON:', text.substring(0, 500))
+    // 3. Extract purely based on braces (find first { and last })
+    const start = cleaned.indexOf('{')
+    const end = cleaned.lastIndexOf('}')
+
+    if (start !== -1 && end !== -1 && end > start) {
+      const jsonCandidate = cleaned.substring(start, end + 1)
+      try {
+        return JSON.parse(jsonCandidate)
+      } catch (e) {
+        console.error('Failed to parse extracted JSON candidate:', e)
+      }
+    }
+
+    console.error('Could not parse AI response as JSON. Raw text:', text.substring(0, 500))
     return null
   }
 
@@ -95,9 +101,9 @@ export function createAIService(settings) {
     /**
      * Parse a resume and extract structured data
      */
-    async parseResume(resumeText) {
+    async parseResume(resumeText, signal) {
       const prompt = getResumeParsePrompt(resumeText)
-      const result = await call(prompt)
+      const result = await call(prompt, signal)
 
       if (!result.success) {
         return result
@@ -114,9 +120,9 @@ export function createAIService(settings) {
     /**
      * Parse a job description and extract requirements
      */
-    async parseJobDescription(jobDescription) {
+    async parseJobDescription(jobDescription, signal) {
       const prompt = getJDParsePrompt(jobDescription)
-      const result = await call(prompt)
+      const result = await call(prompt, signal)
 
       if (!result.success) {
         return result
@@ -133,9 +139,9 @@ export function createAIService(settings) {
     /**
      * Analyze gaps between resume and job description
      */
-    async analyzeGap(parsedResume, parsedJD) {
+    async analyzeGap(parsedResume, parsedJD, signal) {
       const prompt = getGapAnalysisPrompt(parsedResume, parsedJD)
-      const result = await call(prompt)
+      const result = await call(prompt, signal)
 
       if (!result.success) {
         return result
@@ -152,9 +158,9 @@ export function createAIService(settings) {
     /**
      * Generate a tailored summary for a specific job
      */
-    async generateTailoredSummary(parsedResume, parsedJD) {
+    async generateTailoredSummary(parsedResume, parsedJD, signal) {
       const prompt = getTailoredSummaryPrompt(parsedResume, parsedJD)
-      const result = await call(prompt)
+      const result = await call(prompt, signal)
 
       if (!result.success) {
         return result
@@ -166,9 +172,9 @@ export function createAIService(settings) {
     /**
      * Analyze a resume and provide feedback (normal or roast mode)
      */
-    async analyzeResume(parsedResume, mode = 'normal') {
+    async analyzeResume(parsedResume, mode = 'normal', signal) {
       const prompt = getResumeAnalysisPrompt(parsedResume, mode)
-      const result = await call(prompt)
+      const result = await call(prompt, signal)
 
       if (!result.success) {
         return result
@@ -186,8 +192,8 @@ export function createAIService(settings) {
     /**
      * Raw call - send any prompt
      */
-    async rawCall(prompt) {
-      return call(prompt)
+    async rawCall(prompt, signal) {
+      return call(prompt, signal)
     }
   }
 }

@@ -52,10 +52,11 @@
 }
 
 .navbar-logo-text {
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
   color: var(--color-text);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.05em;
+  font-family: var(--font-family);
 }
 
 .top-navbar-logo:hover .navbar-logo-img {
@@ -79,21 +80,23 @@
 }
 
 /* === DEMO BANNER === */
+/* === DEMO BANNER === */
 .demo-banner {
   position: fixed;
   top: var(--header-height);
   left: 0;
   right: 0;
   z-index: 199;
-  background: linear-gradient(90deg, #f59e0b, #d97706);
-  color: white;
+  background: var(--color-bg-elevated);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
   padding: var(--space-2) var(--space-4);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-4);
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
+  font-family: var(--font-family-mono);
 }
 
 .demo-banner-text {
@@ -107,29 +110,39 @@
   display: inline-block;
   width: 8px;
   height: 8px;
-  background: white;
+  background: var(--color-primary);
   border-radius: 50%;
   animation: pulse 1.5s infinite;
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .demo-banner-btn {
   padding: var(--space-1) var(--space-3);
-  background: white;
-  color: #d97706;
+  background: transparent;
+  color: var(--color-error);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-bold);
-  border: none;
+  border: 1px solid var(--color-error);
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition: all var(--transition-fast);
+  text-transform: uppercase;
 }
 
 .demo-banner-btn:hover {
-  background: #fef3c7;
+  background: var(--color-error);
+  color: white;
 }
 
 /* Adjust layout when demo banner is shown */
@@ -140,6 +153,27 @@
 .demo-mode .sidebar {
   top: calc(var(--header-height) + 36px);
   height: calc(100vh - var(--header-height) - 36px);
+}
+
+/* Reconnect Banner */
+.reconnect-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+  color: white;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--space-4);
+  border: 2px solid var(--color-border);
+}
+
+.reconnect-banner button {
+  background: white;
+  color: #2563eb;
+  border-color: white;
 }
 
 .navbar-icon-btn {
@@ -205,6 +239,12 @@
   justify-content: flex-end;
   padding: var(--space-3) var(--space-4);
   flex-shrink: 0;
+  margin-top: 10px;
+}
+
+.collapsed .sidebar-header {
+  justify-content: center;
+  padding: var(--space-3);
 }
 
 .sidebar-logo {
@@ -224,38 +264,57 @@
 }
 
 /* Collapse Button */
+/* Collapse Button - styled to match nav icons */
 .collapse-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  width: 20px;
+  height: 20px;
+  background: transparent;
+  border: none;
   cursor: pointer;
   transition: all var(--transition-fast);
   flex-shrink: 0;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
+  opacity: 0.6;
 }
 
 .collapse-btn:hover {
-  background: var(--color-surface-hover);
   color: var(--color-text);
-  border-color: var(--color-border-light);
+  opacity: 1;
 }
 
 .collapse-icon {
-  width: 8px;
-  height: 8px;
-  border-left: 2px solid currentColor;
-  border-bottom: 2px solid currentColor;
-  transform: rotate(45deg);
+  width: 16px;
+  height: 2px;
+  background: currentColor;
+  position: relative;
+  border: none;
+  transition: all var(--transition-fast);
+}
+
+.collapse-icon::before,
+.collapse-icon::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: currentColor;
   transition: transform var(--transition-fast);
 }
 
+.collapse-icon::before {
+  transform: translateY(-5px);
+}
+
+.collapse-icon::after {
+  transform: translateY(5px);
+}
+
 .collapse-icon.collapsed {
-  transform: rotate(-135deg);
+  transform: none;
 }
 
 /* Sidebar Navigation Container */
@@ -578,6 +637,18 @@
 .navbar-btn:hover {
   transform: translate(-2px, -2px);
   box-shadow: 4px 4px 0 var(--color-border);
+}
+
+/* Exit/Shutdown Button */
+.exit-btn {
+  color: var(--color-text);
+}
+
+.exit-btn:hover {
+  background: var(--color-error);
+  border-color: var(--color-error);
+  color: white;
+  box-shadow: 4px 4px 0 rgba(239, 68, 68, 0.3);
 }
 
 /* Menu Icon */

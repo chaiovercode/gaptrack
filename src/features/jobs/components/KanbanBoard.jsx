@@ -8,13 +8,14 @@ import { useState } from 'react'
 import './KanbanBoard.css'
 
 const ROW_1 = [
+  { id: 'discovered', label: 'Targeted', color: '#94a3b8' },
   { id: 'applied', label: 'Applied', color: '#6366f1' },
   { id: 'screening', label: 'Screening', color: '#8b5cf6' },
   { id: 'interview', label: 'Interview', color: '#f59e0b' },
-  { id: 'offer', label: 'Offer', color: '#10b981' },
 ]
 
 const ROW_2 = [
+  { id: 'offer', label: 'Offer', color: '#10b981' },
   { id: 'accepted', label: 'Accepted', color: '#059669' },
   { id: 'rejected', label: 'Rejected', color: '#ef4444' },
   { id: 'withdrawn', label: 'Withdrawn', color: '#6b7280' },
@@ -74,9 +75,9 @@ function KanbanBoard({ jobs = [], contacts = [], onStatusChange, onDeleteJob, on
 
   // Get match score color
   const getScoreColor = (score) => {
-    if (score >= 70) return 'var(--color-success)'
-    if (score >= 50) return 'var(--color-warning)'
-    return 'var(--color-error)'
+    if (score >= 70) return '#10b981'
+    if (score >= 50) return '#f59e0b'
+    return '#A9070E'
   }
 
   const renderColumn = (column) => (
@@ -109,7 +110,7 @@ function KanbanBoard({ jobs = [], contacts = [], onStatusChange, onDeleteJob, on
                 {job.gapAnalysis?.matchScore && (
                   <span
                     className="kanban-score"
-                    style={{ background: getScoreColor(job.gapAnalysis.matchScore) }}
+                    style={{ color: getScoreColor(job.gapAnalysis.matchScore) }}
                   >
                     {job.gapAnalysis.matchScore}%
                   </span>

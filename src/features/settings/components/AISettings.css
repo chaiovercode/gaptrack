@@ -51,8 +51,25 @@
 }
 
 .provider-card.selected {
-  border-color: var(--color-accent);
-  background-color: var(--color-accent-light);
+  background-color: var(--color-surface-hover);
+  border-color: var(--color-border);
+}
+
+.provider-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.chevron-icon {
+  transition: transform var(--transition-normal);
+  color: var(--color-text-secondary);
+}
+
+.provider-card.selected .chevron-icon {
+  transform: rotate(180deg);
+  color: var(--color-primary);
 }
 
 .provider-badge {
@@ -60,13 +77,28 @@
   font-weight: var(--font-weight-bold);
   text-transform: uppercase;
   padding: var(--space-1) var(--space-2);
-  background: var(--color-text);
-  color: var(--color-surface);
+  background: var(--color-surface);
+  color: var(--color-text);
   border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
 }
 
 .provider-badge.local {
-  background: var(--color-success);
+  background: var(--color-success-light);
+  color: var(--color-success);
+  border-color: var(--color-success);
+}
+
+.provider-badge.configured {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.provider-badges {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
 }
 
 /* Ollama Status */
@@ -76,16 +108,21 @@
   gap: var(--space-2);
   padding: var(--space-3);
   border-radius: var(--radius-md);
-  background: var(--color-border);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
   font-size: var(--font-size-sm);
 }
 
 .ollama-status.running {
-  background: rgba(74, 222, 128, 0.2);
+  background: rgba(74, 156, 93, 0.1);
+  border-color: var(--color-success);
+  color: var(--color-success);
 }
 
 .ollama-status.not-running {
-  background: rgba(248, 113, 113, 0.2);
+  background: rgba(229, 9, 20, 0.1);
+  border-color: var(--color-error);
+  color: var(--color-error);
 }
 
 .status-dot {
@@ -107,30 +144,32 @@
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   background: var(--color-surface);
-  border: var(--border-width) solid var(--color-text);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: all var(--transition-fast);
 }
 
 .model-btn:hover:not(.selected) {
-  border-color: var(--color-accent);
-  background: var(--color-accent-light);
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  color: var(--color-text);
 }
 
 .model-btn.selected,
 .model-btn.selected:hover {
-  background: #ff6b35;
-  border-color: #ff6b35;
+  background: var(--color-primary);
+  border-color: var(--color-primary);
   color: #fff;
 }
 
 /* Setup Instructions */
 .setup-instructions {
-  background: var(--color-accent-light);
+  background: var(--color-bg-elevated);
   padding: var(--space-4);
   border-radius: var(--radius-md);
-  border: var(--border-width) solid var(--color-text);
+  border: 1px solid var(--color-border);
 }
 
 .setup-instructions ol {
@@ -312,4 +351,15 @@ code {
     font-size: 10px;
     padding: 2px var(--space-1);
   }
+}
+
+/* Storage Section */
+.storage-section {
+  margin-top: var(--space-10);
+  padding-top: var(--space-8);
+  border-top: 2px solid var(--color-border);
+}
+
+.storage-section h3 {
+  margin-bottom: var(--space-6);
 }

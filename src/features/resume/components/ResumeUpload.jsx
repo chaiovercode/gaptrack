@@ -10,6 +10,7 @@
 import { useState, useRef } from 'react'
 import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist'
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
+import mammoth from 'mammoth'
 import { Button, TextArea } from '../../../shared/components'
 import './ResumeUpload.css'
 
@@ -51,6 +52,15 @@ function ResumeUpload({ onParse, isProcessing, error }) {
   }
 
   /**
+   * Extract text from DOCX using mammoth
+   */
+  const extractDocxText = async (file) => {
+    const arrayBuffer = await file.arrayBuffer()
+    const result = await mammoth.extractRawText({ arrayBuffer })
+    return result.value.trim()
+  }
+
+  /**
    * Handle file selection (from click or drop)
    */
   const handleFile = async (file) => {
@@ -82,10 +92,13 @@ function ResumeUpload({ onParse, isProcessing, error }) {
           alert('Could not extract text from this PDF. It may be scanned/image-based. Please try pasting the text instead.')
           return
         }
-      } else {
-        // DOCX - complex format
-        alert('DOCX parsing coming soon! For now, please copy the text from your document and use the "Paste Text" tab.')
-        return
+      } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || file.name.endsWith('.docx')) {
+        // Extract text from DOCX using mammoth
+        text = await extractDocxText(file)
+        if (!text.trim()) {
+          alert('Could not extract text from this DOCX file. Please try pasting the text instead.')
+          return
+        }
       }
 
       if (text.trim()) {
@@ -141,8 +154,8 @@ function ResumeUpload({ onParse, isProcessing, error }) {
       <div className="resume-upload">
         <div className="processing-overlay">
           <div className="spinner" />
-          <p className="text-lg font-bold">Analyzing your resume...</p>
-          <p className="text-light">This may take a few seconds</p>
+          <p className="text-lg font-bold">decrypting_dossier...</p>
+          <p className="text-light">parsing identity structures</p>
         </div>
       </div>
     )
@@ -164,14 +177,14 @@ function ResumeUpload({ onParse, isProcessing, error }) {
           className={`upload-tab ${activeTab === 'upload' ? 'active' : ''}`}
           onClick={() => setActiveTab('upload')}
         >
-          Upload File
+          upload_binary
         </button>
         <button
           type="button"
           className={`upload-tab ${activeTab === 'paste' ? 'active' : ''}`}
           onClick={() => setActiveTab('paste')}
         >
-          Paste Text
+          inject_payload
         </button>
       </div>
 
@@ -186,8 +199,8 @@ function ResumeUpload({ onParse, isProcessing, error }) {
         >
           <span className="drop-zone-icon">+</span>
           <div className="drop-zone-text">
-            <p>Drop your resume here</p>
-            <p>or click to browse (PDF, TXT)</p>
+            <p>drop file stream here</p>
+            <p>or click to mount (pdf, docx, txt)</p>
           </div>
           <input
             type="file"
@@ -203,25 +216,25 @@ function ResumeUpload({ onParse, isProcessing, error }) {
       {activeTab === 'paste' && (
         <div className="paste-area">
           <TextArea
-            placeholder="Paste your resume text here...
+            placeholder="paste raw data here...
 
-Example:
-John Doe
-Software Engineer | john@email.com
+example:
+elliot alderson
+security engineer | elliot@allsafe.com
 
-EXPERIENCE
-Senior Developer at Tech Corp (2020-Present)
-- Built scalable microservices
-- Led team of 5 developers
+experience
+senior security analyst at allsafe (2014-2015)
+- network security audits
+- incident response
 
-SKILLS
-JavaScript, React, Node.js, Python"
+skills
+penetration testing, python, linux"
             value={pasteText}
             onChange={setPasteText}
             rows={12}
           />
           <p className="paste-hint">
-            Tip: Copy all text from your resume PDF/document and paste above
+            tip: copy text from source and inject above
           </p>
           <div className="upload-actions">
             <Button
@@ -229,7 +242,7 @@ JavaScript, React, Node.js, Python"
               onClick={handlePasteSubmit}
               disabled={!pasteText.trim()}
             >
-              Analyze Resume
+              initiate_scan
             </Button>
           </div>
         </div>

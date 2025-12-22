@@ -22,11 +22,12 @@
   padding: var(--space-3) var(--space-4);
   font-family: var(--font-family);
   font-size: var(--font-size-base);
-  color: var(--color-text);
-  background: var(--color-bg-elevated);
+  color: var(--color-text) !important;
+  background: var(--color-surface) !important;
   border: 2px solid var(--color-border);
   border-radius: 0;
   transition: all 0.1s ease;
+  -webkit-text-fill-color: var(--color-text);
 }
 
 .input:hover:not(:disabled):not(:focus) {

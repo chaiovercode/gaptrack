@@ -24,7 +24,7 @@ const RECOMMENDED_MODELS = [
 
 function AISettings({ settings, onSave, onResetApp }) {
   // Local state for form
-  const [provider, setProvider] = useState(settings?.aiProvider || null)
+  const [provider, setProvider] = useState(null)
   const [geminiKey, setGeminiKey] = useState(settings?.geminiApiKey || '')
   const [openaiKey, setOpenaiKey] = useState(settings?.openaiApiKey || '')
   const [ollamaModel, setOllamaModel] = useState(settings?.ollamaModel || '')
@@ -135,126 +135,58 @@ function AISettings({ settings, onSave, onResetApp }) {
 
   return (
     <div className="ai-settings">
-      <h3 className="text-xl font-bold mb-4">Choose AI Provider</h3>
+      <h3 className="text-xl font-bold mb-4 font-mono">configure_daemon</h3>
 
       {/* Provider Selection - Each with config below */}
+      {/* Provider Selection - Each with config below */}
+      {/* Provider Selection - Each with config below */}
       <div className="provider-options">
-        {/* Gemini Option */}
-        <div className="provider-group">
-          <Card
-            padding="md"
-            className={`provider-card ${provider === 'gemini' ? 'selected' : ''}`}
-            onClick={() => setProvider('gemini')}
-          >
-            <div className="flex justify-between items-start">
-              <div>
-                <h4 className="font-bold">Gemini</h4>
-                <p className="text-sm text-light mt-1">
-                  Fast, cloud-based.
-                </p>
-              </div>
-              <span className="provider-badge">Cloud</span>
-            </div>
-          </Card>
-
-          {/* Gemini Configuration */}
-          {provider === 'gemini' && (
-            <Card padding="md" className="provider-config">
-              <h4 className="font-bold mb-4">Gemini Setup</h4>
-              <Input
-                label="API Key"
-                type="password"
-                value={geminiKey}
-                onChange={setGeminiKey}
-                placeholder="Paste your Gemini API key"
-              />
-              <p className="text-sm text-light mt-2">
-                Get a free key at{' '}
-                <a
-                  href="https://aistudio.google.com/app/apikey"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary"
-                >
-                  aistudio.google.com
-                </a>
-              </p>
-            </Card>
-          )}
-        </div>
-
-        {/* OpenAI Option */}
-        <div className="provider-group">
-          <Card
-            padding="md"
-            className={`provider-card ${provider === 'openai' ? 'selected' : ''}`}
-            onClick={() => setProvider('openai')}
-          >
-            <div className="flex justify-between items-start">
-              <div>
-                <h4 className="font-bold">OpenAI</h4>
-                <p className="text-sm text-light mt-1">
-                  GPT-4o vision. Pay-as-you-go pricing.
-                </p>
-              </div>
-              <span className="provider-badge">Cloud</span>
-            </div>
-          </Card>
-
-          {/* OpenAI Configuration */}
-          {provider === 'openai' && (
-            <Card padding="md" className="provider-config">
-              <h4 className="font-bold mb-4">OpenAI Setup</h4>
-              <Input
-                label="API Key"
-                type="password"
-                value={openaiKey}
-                onChange={setOpenaiKey}
-                placeholder="Paste your OpenAI API key (sk-...)"
-              />
-              <p className="text-sm text-light mt-2">
-                Get a key at{' '}
-                <a
-                  href="https://platform.openai.com/api-keys"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary"
-                >
-                  platform.openai.com
-                </a>
-                {' '}(pay-as-you-go)
-              </p>
-            </Card>
-          )}
-        </div>
-
-        {/* Ollama Option */}
+        {/* Ollama Option - FIRST PRIORITY */}
         <div className="provider-group">
           <Card
             padding="md"
             className={`provider-card ${provider === 'ollama' ? 'selected' : ''}`}
-            onClick={() => setProvider('ollama')}
+            onClick={() => setProvider(provider === 'ollama' ? null : 'ollama')}
           >
             <div className="flex justify-between items-start">
               <div>
-                <h4 className="font-bold">Ollama (Local)</h4>
+                <h4 className="font-bold">ollama (local)</h4>
                 <p className="text-sm text-light mt-1">
-                  100% private. Local AI for resume/JD parsing.
+                  local instance. air-gapped logic. strictly need-to-know.
                 </p>
               </div>
-              <span className="provider-badge local">Local</span>
+              <div className="flex items-center gap-3">
+                <div className="provider-badges">
+                  {settings?.ollamaModel && <span className="provider-badge configured">active</span>}
+                  <span className="provider-badge local">secure</span>
+                </div>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="chevron-icon"
+                >
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </div>
             </div>
           </Card>
 
           {/* Ollama Configuration */}
           {provider === 'ollama' && (
             <Card padding="md" className="provider-config">
-              <h4 className="font-bold mb-4">Ollama Setup</h4>
+              <h4 className="font-bold mb-4">local_host setup</h4>
 
               {/* Loading State */}
               {isCheckingOllama && (
                 <div className="ollama-status">
-                  <span>Checking Ollama status...</span>
+                  <span>pinging localhost:11434...</span>
                 </div>
               )}
 
@@ -264,27 +196,27 @@ function AISettings({ settings, onSave, onResetApp }) {
                   {ollamaStatus.running ? (
                     <>
                       <span className="status-dot"></span>
-                      <span>Ollama is running</span>
+                      <span>daemon active</span>
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={checkOllamaModels}
                         className="ml-auto"
                       >
-                        Refresh
+                        refresh_signal
                       </Button>
                     </>
                   ) : (
                     <>
                       <span className="status-dot offline"></span>
-                      <span>Ollama not detected</span>
+                      <span>connection refused</span>
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={checkOllamaModels}
                         className="ml-auto"
                       >
-                        Retry
+                        retry_handshake
                       </Button>
                     </>
                   )}
@@ -294,13 +226,13 @@ function AISettings({ settings, onSave, onResetApp }) {
               {/* Ollama Running - Show Models */}
               {ollamaStatus?.running && (
                 <div className="mt-4">
-                  <label className="text-sm font-bold">Select Model</label>
+                  <label className="text-sm font-bold">select_model</label>
 
                   {/* Installed Models */}
                   {ollamaStatus.availableModels?.length > 0 ? (
                     <>
                       <p className="text-sm text-light mt-1 mb-2">
-                        {ollamaStatus.availableModels.length} model(s) installed:
+                        {ollamaStatus.availableModels.length} compatible models found:
                       </p>
                       <div className="flex gap-2 flex-wrap">
                         {ollamaStatus.availableModels.map(model => (
@@ -316,9 +248,9 @@ function AISettings({ settings, onSave, onResetApp }) {
                     </>
                   ) : (
                     <div className="no-models-warning mt-2">
-                      <p className="font-bold">No models installed!</p>
+                      <p className="font-bold">model_registry empty</p>
                       <p className="text-sm mt-1">
-                        You need to pull a model first. Run one of these commands:
+                        pull necessary files via terminal:
                       </p>
                     </div>
                   )}
@@ -326,13 +258,13 @@ function AISettings({ settings, onSave, onResetApp }) {
                   {/* Custom Model Input */}
                   <div className="mt-4">
                     <Input
-                      label="Or enter model name manually"
+                      label="manual_override"
                       value={customModel}
                       onChange={handleCustomModelChange}
                       placeholder="e.g., mistral, llama3.2, phi3"
                     />
                     <p className="text-sm text-light mt-1">
-                      Models that support structured JSON output work best
+                      warning: json_mode compatibility required.
                     </p>
                   </div>
 
@@ -340,26 +272,26 @@ function AISettings({ settings, onSave, onResetApp }) {
                   {selectedModel && (
                     <div className={`selected-model mt-4 ${isModelInstalled ? '' : 'not-installed'}`}>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm">Selected:</span>
+                        <span className="text-sm">target:</span>
                         <span className="font-bold">{selectedModel}</span>
                         {isModelInstalled ? (
-                          <span className="text-success text-sm">✓ Installed</span>
+                          <span className="text-success text-sm">[installed]</span>
                         ) : (
-                          <span className="text-error text-sm">✗ Not installed</span>
+                          <span className="text-error text-sm">[missing]</span>
                         )}
                       </div>
                       {!isModelInstalled && (
                         <div className="model-install-prompt mt-3">
-                          <p className="text-sm mb-2">Run this command in your terminal to install:</p>
+                          <p className="text-sm mb-2">execute command:</p>
                           <button
                             className="install-command"
                             onClick={() => copyCommand(`ollama pull ${selectedModel}`)}
                           >
                             <code>ollama pull {selectedModel}</code>
-                            <span className="copy-hint">Click to copy</span>
+                            <span className="copy-hint">copy_to_clipboard</span>
                           </button>
                           <p className="text-sm text-light mt-2">
-                            After installing, click "Refresh" above to update the model list.
+                            after download complete, refresh signal.
                           </p>
                         </div>
                       )}
@@ -371,18 +303,18 @@ function AISettings({ settings, onSave, onResetApp }) {
               {/* Not Running - Setup Instructions */}
               {!isCheckingOllama && !ollamaStatus?.running && (
                 <div className="setup-instructions mt-4">
-                  <p className="font-bold mb-2">Setup Instructions:</p>
+                  <p className="font-bold mb-2">initialization_sequence:</p>
                   <ol className="text-sm">
                     <li>
-                      <span className="step-label">Install Ollama:</span>
+                      <span className="step-label">install binary:</span>
                       <code>curl -fsSL https://ollama.com/install.sh | sh</code>
                     </li>
                     <li>
-                      <span className="step-label">Pull a model:</span>
+                      <span className="step-label">retrieve model:</span>
                       <code>ollama pull mistral</code>
                     </li>
                     <li>
-                      <span className="step-label">Start Ollama:</span>
+                      <span className="step-label">start daemon:</span>
                       <code>ollama serve</code>
                     </li>
                   </ol>
@@ -392,28 +324,155 @@ function AISettings({ settings, onSave, onResetApp }) {
               {/* No Models - Suggestion for text extraction */}
               {ollamaStatus?.running && ollamaStatus.availableModels?.length === 0 && (
                 <div className="setup-instructions mt-4">
-                  <p className="font-bold mb-2">Recommended Models for Resume/JD Parsing:</p>
-                  <p className="text-sm text-light mb-3">Click a command to copy, then paste in your terminal:</p>
+                  <p className="font-bold mb-2">recommended_models:</p>
+                  <p className="text-sm text-light mb-3">click to copy command:</p>
                   <div className="model-suggestions">
                     <button className="suggestion" onClick={() => copyCommand('ollama pull mistral')}>
                       <code>ollama pull mistral</code>
-                      <span className="text-sm text-light">Best for JSON output (4.1GB) - Recommended</span>
+                      <span className="text-sm text-light">optimized for logic (4.1gb)</span>
                     </button>
                     <button className="suggestion" onClick={() => copyCommand('ollama pull llama3.2')}>
                       <code>ollama pull llama3.2</code>
-                      <span className="text-sm text-light">Lightweight alternative (2.0GB)</span>
+                      <span className="text-sm text-light">lightweight agent (2.0gb)</span>
                     </button>
                     <button className="suggestion" onClick={() => copyCommand('ollama pull phi3')}>
                       <code>ollama pull phi3</code>
-                      <span className="text-sm text-light">Microsoft's small model (2.2GB)</span>
+                      <span className="text-sm text-light">minimal footprint (2.2gb)</span>
                     </button>
                     <button className="suggestion" onClick={() => copyCommand('ollama pull qwen2.5')}>
                       <code>ollama pull qwen2.5</code>
-                      <span className="text-sm text-light">Good for structured output (4.7GB)</span>
+                      <span className="text-sm text-light">structured output (4.7gb)</span>
                     </button>
                   </div>
                 </div>
               )}
+            </Card>
+          )}
+        </div>
+
+        {/* Gemini Option */}
+        <div className="provider-group">
+          <Card
+            padding="md"
+            className={`provider-card ${provider === 'gemini' ? 'selected' : ''}`}
+            onClick={() => setProvider(provider === 'gemini' ? null : 'gemini')}
+          >
+            <div className="flex justify-between items-start">
+              <div>
+                <h4 className="font-bold">gemini_protocol</h4>
+                <p className="text-sm text-light mt-1">
+                  corporate surveillance. efficient. weaponize google's intelligence against them.
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="provider-badges">
+                  {settings?.geminiApiKey && <span className="provider-badge configured">active</span>}
+                  <span className="provider-badge">cloud</span>
+                </div>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="chevron-icon"
+                >
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </div>
+            </div>
+          </Card>
+
+          {/* Gemini Configuration */}
+          {provider === 'gemini' && (
+            <Card padding="md" className="provider-config">
+              <h4 className="font-bold mb-4">credentials_required</h4>
+              <Input
+                label="access_token"
+                type="password"
+                value={geminiKey}
+                onChange={setGeminiKey}
+                placeholder="paste key sequence..."
+              />
+              <p className="text-sm text-light mt-2">
+                retrieve key from{' '}
+                <a
+                  href="https://aistudio.google.com/app/apikey"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary"
+                >
+                  google_mainframe
+                </a>
+              </p>
+            </Card>
+          )}
+        </div>
+
+        {/* OpenAI Option */}
+        <div className="provider-group">
+          <Card
+            padding="md"
+            className={`provider-card ${provider === 'openai' ? 'selected' : ''}`}
+            onClick={() => setProvider(provider === 'openai' ? null : 'openai')}
+          >
+            <div className="flex justify-between items-start">
+              <div>
+                <h4 className="font-bold">openai_link</h4>
+                <p className="text-sm text-light mt-1">
+                  closed source. expensive. maximum firepower to defeat the filters.
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="provider-badges">
+                  {settings?.openaiApiKey && <span className="provider-badge configured">active</span>}
+                  <span className="provider-badge">cloud</span>
+                </div>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="chevron-icon"
+                >
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </div>
+            </div>
+          </Card>
+
+          {/* OpenAI Configuration */}
+          {provider === 'openai' && (
+            <Card padding="md" className="provider-config">
+              <h4 className="font-bold mb-4">authorization_needed</h4>
+              <Input
+                label="api_key"
+                type="password"
+                value={openaiKey}
+                onChange={setOpenaiKey}
+                placeholder="sk-..."
+              />
+              <p className="text-sm text-light mt-2">
+                generate token at{' '}
+                <a
+                  href="https://platform.openai.com/api-keys"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary"
+                >
+                  openai_dashboard
+                </a>
+                {' '}(credits required)
+              </p>
             </Card>
           )}
         </div>
@@ -427,14 +486,14 @@ function AISettings({ settings, onSave, onResetApp }) {
             onClick={handleTestConnection}
             disabled={testStatus === 'testing' || (provider === 'ollama' && !selectedModel)}
           >
-            {testStatus === 'testing' ? 'Testing...' : 'Test Connection'}
+            {testStatus === 'testing' ? 'pinging...' : 'test_connection'}
           </Button>
 
           {testStatus === 'success' && (
-            <span className="text-success font-bold">{testMessage}</span>
+            <span className="text-success font-bold font-mono">{testMessage || 'uplink_established'}</span>
           )}
           {testStatus === 'error' && (
-            <span className="text-error">{testMessage}</span>
+            <span className="text-error font-mono">{testMessage || 'uplink_failed'}</span>
           )}
         </div>
       )}
@@ -448,32 +507,32 @@ function AISettings({ settings, onSave, onResetApp }) {
           disabled={!canSave}
           className="w-full"
         >
-          {onResetApp ? 'Save' : 'Save & Continue'}
+          {onResetApp ? 'commit_changes' : 'init_sequence'}
         </Button>
       </div>
 
       {/* Data Storage Section - Only show when onResetApp is provided (in settings page) */}
       {onResetApp && (
-        <div className="storage-section pt-6" style={{ marginTop: '40px', borderTop: '2px solid var(--color-border)' }}>
-          <h3 className="text-lg font-bold mb-4">Data Storage</h3>
+        <div className="storage-section">
+          <h3 className="text-lg font-bold mb-4 font-mono">local_storage</h3>
           <Card padding="md">
             <div className="flex justify-between items-start gap-4">
               <div>
-                <p className="font-medium">Storage Location</p>
+                <p className="font-medium mb-2">encryption_status</p>
                 <p className="text-sm text-light mt-1">
-                  Your data is stored locally on your device. Nothing is sent to any server.
+                  data resides on local disk. air-gapped from cloud storage. no external access.
                 </p>
               </div>
             </div>
-            <div className="mt-4 pt-4" style={{ borderTop: '1px solid var(--color-border)' }}>
-              <p className="text-sm text-light mb-3">
-                Want to start fresh or switch to a different setup?
+            <div className="mt-6 pt-6" style={{ borderTop: '1px solid var(--color-border)' }}>
+              <p className="text-sm text-light mb-4">
+                compromised system? need a fresh start?
               </p>
               <Button
                 variant="secondary"
                 onClick={() => setShowResetConfirm(true)}
               >
-                Reset App & Start Fresh
+                system_purge
               </Button>
             </div>
           </Card>
@@ -484,22 +543,25 @@ function AISettings({ settings, onSave, onResetApp }) {
       <Modal
         isOpen={showResetConfirm}
         onClose={() => setShowResetConfirm(false)}
-        title="Reset App?"
+        title="confirm_deletion"
         size="sm"
       >
         <div className="reset-confirm-content">
-          <p className="mb-4">
-            This will clear all your data including jobs, contacts, and resume. You'll return to the setup screen.
+          <p className="mb-4 text-error font-bold">
+            WARNING: Irreversible action.
           </p>
-          <p className="text-sm text-light mb-6">
-            This action cannot be undone.
+          <p className="mb-4">
+            Wiping sector 0 through 9. Targets, contacts, and dossier will be permanently deleted.
+          </p>
+          <p className="text-sm text-light mb-6 font-mono">
+            {'>'} sudo rm -rf /root/gaptrack/*
           </p>
           <div className="flex gap-3 justify-end">
             <Button
               variant="secondary"
               onClick={() => setShowResetConfirm(false)}
             >
-              Cancel
+              abort
             </Button>
             <Button
               variant="primary"
@@ -509,7 +571,7 @@ function AISettings({ settings, onSave, onResetApp }) {
               }}
               style={{ background: 'var(--color-error)', borderColor: 'var(--color-error)' }}
             >
-              Yes, Reset Everything
+              execute_purge
             </Button>
           </div>
         </div>

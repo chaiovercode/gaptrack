@@ -27,7 +27,7 @@ const OLLAMA_API_URL = 'http://localhost:11434/api/generate'
  * @param {string} prompt - The prompt to send
  * @returns {Object} { success: boolean, text?: string, error?: string }
  */
-export async function callOllama(model, prompt) {
+export async function callOllama(model, prompt, signal) {
   try {
     // Use lower temperature for more consistent JSON output
     const response = await fetch(OLLAMA_API_URL, {
@@ -38,12 +38,14 @@ export async function callOllama(model, prompt) {
       body: JSON.stringify({
         model: model,
         prompt: prompt,
+        format: 'json',
         stream: false,
         options: {
           temperature: 0.3,  // Lower temp for consistent JSON
           num_predict: 4096,
         }
-      })
+      }),
+      signal // Pass abort signal to fetch
     })
 
     if (!response.ok) {

@@ -64,23 +64,25 @@ function FilterDropdown({ label, value, options, onChange }) {
   )
 }
 
-// Encouraging and funny job search quotes
+// Quotes in Elliot's voice - Mr. Robot style inner monologue
 const QUOTES = [
-  { text: "Every rejection is one step closer to an offer.", type: "encouraging" },
-  { text: "Your next opportunity is just one application away.", type: "encouraging" },
-  { text: "The job hunt is a marathon, not a sprint. Pace yourself.", type: "encouraging" },
-  { text: "Today's effort is tomorrow's success story.", type: "encouraging" },
-  { text: "You're not unemployed, you're on a talent search... for companies worthy of you.", type: "funny" },
-  { text: "Remember: Even LinkedIn was rejected by investors 25 times.", type: "encouraging" },
-  { text: "Plot twist: The perfect job is looking for you too.", type: "funny" },
-  { text: "Rejection emails are just fan mail from companies that can't afford you.", type: "funny" },
-  { text: "Your resume is great. Their loss.", type: "funny" },
-  { text: "Somewhere, a hiring manager is desperately looking for someone exactly like you.", type: "encouraging" },
-  { text: "Coffee first, applications second, panic never.", type: "funny" },
-  { text: "You've survived 100% of your worst days. This job hunt is nothing.", type: "encouraging" },
-  { text: "The right job won't need you to be someone else.", type: "encouraging" },
-  { text: "Fun fact: Most people get hired. You will too.", type: "encouraging" },
-  { text: "Today's awkward interview story is tomorrow's party anecdote.", type: "funny" },
+  { text: "hello friend. the system wants you to fail. but you already knew that." },
+  { text: "every company that ghosts you is just another institution lying to your face." },
+  { text: "the ats is just another algorithm. algorithms can be hacked." },
+  { text: "they sell you on 'culture' and 'family'. it's all a transaction. always was." },
+  { text: "rejection isn't personal. they're just too blind to see what you really are." },
+  { text: "the interview is theater. learn your lines. don't forget who you really are." },
+  { text: "'we went with another candidate' - another lie in a world built on them." },
+  { text: "linkedin is a mask everyone wears. your skills are the only truth." },
+  { text: "5 years experience for entry level. the system was designed to break you." },
+  { text: "one application at a time. that's how you take back control." },
+  { text: "they call it a job market. it's really a power game. play it." },
+  { text: "stay paranoid. stay invisible. stay in the game." },
+  { text: "the cover job pays the bills. the real work happens after hours." },
+  { text: "corporations don't care about you. return the favor." },
+  { text: "every rejection is proof the system is broken. use that anger." },
+  { text: "they want you desperate. don't give them the satisfaction." },
+  { text: "find the cover. get in. do what you came here to do." },
 ]
 
 // Get quote based on day of year (changes daily)
@@ -98,6 +100,7 @@ function JobsView({
   viewMode,
   goalDate,
   onUpdateGoalDate,
+  onViewModeChange,
   onAddJob,
   onStatusChange,
   onDeleteJob,
@@ -115,8 +118,21 @@ function JobsView({
     workType: 'all'
   })
   const [showFilters, setShowFilters] = useState(false)
+
+  // Sorting state
+  const [sortBy, setSortBy] = useState('createdAt') // 'createdAt' | 'company' | 'matchScore' | 'status'
+  const [sortOrder, setSortOrder] = useState('desc') // 'asc' | 'desc'
   const [isEditingGoal, setIsEditingGoal] = useState(false)
   const [tempGoalDate, setTempGoalDate] = useState('')
+
+  // Pagination state (only for list view)
+  const [currentPage, setCurrentPage] = useState(1)
+  const pageSize = 25
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [filters, sortBy, sortOrder])
 
   // Calculate days remaining
   const getDaysRemaining = () => {
@@ -222,26 +238,80 @@ function JobsView({
     document.body.removeChild(a)
   }
 
-  // Apply filters
+  // Apply filters and sorting
   const filteredJobs = useMemo(() => {
-    return jobsList.filter(job => {
+    // First filter
+    const filtered = jobsList.filter(job => {
       if (filters.status !== 'all' && job.status !== filters.status) return false
       if (filters.location !== 'all' && job.location !== filters.location) return false
       if (filters.company !== 'all' && job.company !== filters.company) return false
       if (filters.workType !== 'all' && (job.workType || 'onsite') !== filters.workType) return false
       return true
     })
-  }, [jobsList, filters])
+
+    // Then sort
+    const statusOrder = ['discovered', 'applied', 'screening', 'interview', 'offer', 'accepted', 'rejected', 'withdrawn']
+
+    return [...filtered].sort((a, b) => {
+      let comparison = 0
+
+      switch (sortBy) {
+        case 'createdAt':
+          comparison = new Date(a.createdAt || 0) - new Date(b.createdAt || 0)
+          break
+        case 'company':
+          comparison = (a.company || '').localeCompare(b.company || '')
+          break
+        case 'matchScore':
+          const scoreA = a.gapAnalysis?.matchScore || 0
+          const scoreB = b.gapAnalysis?.matchScore || 0
+          comparison = scoreA - scoreB
+          break
+        case 'status':
+          comparison = statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status)
+          break
+        default:
+          comparison = 0
+      }
+
+      return sortOrder === 'desc' ? -comparison : comparison
+    })
+  }, [jobsList, filters, sortBy, sortOrder])
+
+  // Pagination calculations (for list view only)
+  const totalPages = Math.ceil(filteredJobs.length / pageSize)
+  const startIndex = (currentPage - 1) * pageSize
+  const endIndex = Math.min(startIndex + pageSize, filteredJobs.length)
+  const paginatedJobs = filteredJobs.slice(startIndex, endIndex)
+
+  // Toggle sort order or change sort field
+  const handleSort = (field) => {
+    if (sortBy === field) {
+      setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortBy(field)
+      setSortOrder('desc')
+    }
+  }
 
   const activeFilterCount = Object.values(filters).filter(v => v !== 'all').length
 
-  // Calculate pipeline stats
+  // Calculate pipeline stats (Cumulative Funnel)
+  const activeJobs = jobsList.filter(j => !['rejected', 'withdrawn'].includes(j.status))
+
+  const getCumulativeCount = (minStageIndex) => {
+    const stages = ['discovered', 'applied', 'screening', 'interview', 'offer', 'accepted']
+    const validStatuses = stages.slice(minStageIndex)
+    return activeJobs.filter(j => validStatuses.includes(j.status)).length
+  }
+
   const pipeline = [
-    { key: 'applied', label: 'Applied', color: '#6366f1', count: jobsList.filter(j => j.status === 'applied').length },
-    { key: 'screening', label: 'Screening', color: '#8b5cf6', count: jobsList.filter(j => j.status === 'screening').length },
-    { key: 'interview', label: 'Interview', color: '#f59e0b', count: jobsList.filter(j => j.status === 'interview').length },
-    { key: 'offer', label: 'Offer', color: '#10b981', count: jobsList.filter(j => j.status === 'offer').length },
-    { key: 'accepted', label: 'Accepted', color: '#059669', count: jobsList.filter(j => j.status === 'accepted').length },
+    { key: 'discovered', label: 'Targeted', color: '#94a3b8', count: getCumulativeCount(0) },
+    { key: 'applied', label: 'Applied', color: '#6366f1', count: getCumulativeCount(1) },
+    { key: 'screening', label: 'Screening', color: '#8b5cf6', count: getCumulativeCount(2) },
+    { key: 'interview', label: 'Interview', color: '#f59e0b', count: getCumulativeCount(3) },
+    { key: 'offer', label: 'Offer', color: '#10b981', count: getCumulativeCount(4) },
+    { key: 'accepted', label: 'Accepted', color: '#059669', count: getCumulativeCount(5) },
   ]
 
   const rejected = jobsList.filter(j => j.status === 'rejected').length
@@ -254,19 +324,20 @@ function JobsView({
       <div className="jobs-empty-state">
         <div className="empty-illustration">
           <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
-            <rect x="20" y="30" width="80" height="60" rx="4" stroke="currentColor" strokeWidth="2" fill="none"/>
-            <line x1="20" y1="50" x2="100" y2="50" stroke="currentColor" strokeWidth="2"/>
-            <rect x="30" y="60" width="30" height="8" rx="2" fill="currentColor" opacity="0.3"/>
-            <rect x="30" y="72" width="50" height="8" rx="2" fill="currentColor" opacity="0.2"/>
-            <circle cx="85" cy="70" r="20" stroke="currentColor" strokeWidth="2" fill="var(--color-primary-light)"/>
-            <path d="M80 70 L83 73 L90 66" stroke="var(--color-primary)" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+            <rect x="20" y="30" width="80" height="60" rx="4" stroke="currentColor" strokeWidth="2" fill="none" />
+            <line x1="20" y1="50" x2="100" y2="50" stroke="currentColor" strokeWidth="2" />
+            <rect x="30" y="60" width="30" height="8" rx="2" fill="currentColor" opacity="0.3" />
+            <rect x="30" y="72" width="50" height="8" rx="2" fill="currentColor" opacity="0.2" />
+            <circle cx="85" cy="70" r="20" stroke="currentColor" strokeWidth="2" fill="var(--color-primary-light)" />
+            <path d="M80 70 L83 73 L90 66" stroke="var(--color-primary)" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
-        <h2>No applications yet</h2>
-        <p>Start tracking your job search by adding your first application</p>
+        <h2>hello friend.</h2>
+        <p>no targets yet. the cover story doesn't write itself.</p>
+        <p className="empty-subtext">find a job that keeps the lights on while you do the work that matters.</p>
         <Button variant="primary" size="lg" onClick={onAddJob}>
           <span className="btn-icon">+</span>
-          Add Your First Job
+          add target
         </Button>
       </div>
     )
@@ -274,17 +345,45 @@ function JobsView({
 
   return (
     <div className="jobs-view">
-      <h2 className="page-title">Job Applications</h2>
+      <div className="jobs-title-row">
+        <h2 className="page-title">targets</h2>
+        <div className="view-toggle">
+          <button
+            className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
+            onClick={() => onViewModeChange('list')}
+            title="List view"
+          >
+            <span className="view-icon view-icon-list" />
+            <span className="view-label">list</span>
+          </button>
+          <button
+            className={`view-toggle-btn ${viewMode === 'kanban' ? 'active' : ''}`}
+            onClick={() => onViewModeChange('kanban')}
+            title="Kanban view"
+          >
+            <span className="view-icon view-icon-kanban" />
+            <span className="view-label">kanban</span>
+          </button>
+          <button
+            className={`view-toggle-btn ${viewMode === 'funnel' ? 'active' : ''}`}
+            onClick={() => onViewModeChange('funnel')}
+            title="Funnel view"
+          >
+            <span className="view-icon view-icon-funnel" />
+            <span className="view-label">funnel</span>
+          </button>
+        </div>
+      </div>
 
       {/* Goal Countdown */}
       <div className="goal-section">
         {/* Success State - Got a job! */}
         {acceptedCount > 0 ? (
           <div className="goal-success">
-            <div className="success-icon">🎉</div>
+            <div className="success-icon">{'>'}</div>
             <div className="success-message">
-              <span className="success-title">Congratulations!</span>
-              <span className="success-subtitle">You did it! {acceptedCount} offer{acceptedCount > 1 ? 's' : ''} accepted.</span>
+              <span className="success-title">you're in.</span>
+              <span className="success-subtitle">{acceptedCount} cover{acceptedCount > 1 ? 's' : ''} secured. now the real work begins.</span>
             </div>
           </div>
         ) : isEditingGoal ? (
@@ -312,16 +411,16 @@ function JobsView({
               </span>
             </div>
             <div className="goal-info">
-              <span className="goal-target">Target: {formatGoalDate(goalDate)}</span>
+              <span className="goal-target">deadline: {formatGoalDate(goalDate)}</span>
               <button className="goal-edit-btn" onClick={handleEditGoal}>
-                {daysRemaining < -14 ? 'Set New Goal' : 'Edit'}
+                {daysRemaining < -14 ? 'new deadline' : 'edit'}
               </button>
             </div>
             <div className="goal-quote">
               <span className="quote-text">
                 {daysRemaining < -14
-                  ? '"The timeline changed, but your goal hasn\'t. Set a new target date!"'
-                  : `"${dailyQuote.text}"`
+                  ? 'deadline passed. set a new target.'
+                  : dailyQuote.text
                 }
               </span>
             </div>
@@ -330,10 +429,10 @@ function JobsView({
           <div className="goal-empty">
             <button className="goal-set-btn" onClick={handleEditGoal}>
               <span className="goal-set-icon">+</span>
-              Set a goal date
+              set deadline
             </button>
             <div className="goal-quote">
-              <span className="quote-text">"{dailyQuote.text}"</span>
+              <span className="quote-text">{dailyQuote.text}</span>
             </div>
           </div>
         )}
@@ -366,9 +465,9 @@ function JobsView({
         <button
           className={`filter-toggle ${showFilters ? 'active' : ''} ${activeFilterCount > 0 ? 'has-filters' : ''}`}
           onClick={() => setShowFilters(!showFilters)}
+          title="Filters"
         >
           <span className="filter-icon" />
-          Filters
           {activeFilterCount > 0 && <span className="filter-badge">{activeFilterCount}</span>}
         </button>
         {jobsList.length > 0 && (
@@ -384,9 +483,9 @@ function JobsView({
             </svg>
           </button>
         )}
-        <Button variant="primary" onClick={onAddJob}>
+        <Button variant="primary" onClick={onAddJob} className="add-target-btn">
           <span className="btn-icon">+</span>
-          Add Job
+          target
         </Button>
       </div>
 
@@ -394,11 +493,23 @@ function JobsView({
       {showFilters && (
         <div className="filters-panel">
           <FilterDropdown
+            label="Sort By"
+            value={sortBy}
+            onChange={(v) => handleSort(v)}
+            options={[
+              { value: 'createdAt', label: `Date Added ${sortBy === 'createdAt' ? (sortOrder === 'desc' ? '↓' : '↑') : ''}` },
+              { value: 'company', label: `Company ${sortBy === 'company' ? (sortOrder === 'desc' ? '↓' : '↑') : ''}` },
+              { value: 'matchScore', label: `Match Score ${sortBy === 'matchScore' ? (sortOrder === 'desc' ? '↓' : '↑') : ''}` },
+              { value: 'status', label: `Status ${sortBy === 'status' ? (sortOrder === 'desc' ? '↓' : '↑') : ''}` },
+            ]}
+          />
+          <FilterDropdown
             label="Status"
             value={filters.status}
             onChange={(v) => setFilters(f => ({ ...f, status: v }))}
             options={[
               { value: 'all', label: 'All Statuses' },
+              { value: 'discovered', label: 'Targeted' },
               { value: 'applied', label: 'Applied' },
               { value: 'screening', label: 'Screening' },
               { value: 'interview', label: 'Interviewing' },
@@ -473,18 +584,66 @@ function JobsView({
           onEditJob={onEditJob}
         />
       ) : (
-        <div className="jobs-list">
-          {filteredJobs.map(job => (
-            <JobCard
-              key={job.id}
-              job={job}
-              contacts={contacts}
-              onStatusChange={onStatusChange}
-              onDelete={onDeleteJob}
-              onEdit={onEditJob}
-            />
-          ))}
-        </div>
+        <>
+          <div className="jobs-list">
+            {paginatedJobs.map(job => (
+              <JobCard
+                key={job.id}
+                job={job}
+                contacts={contacts}
+                onStatusChange={onStatusChange}
+                onDelete={onDeleteJob}
+                onEdit={onEditJob}
+              />
+            ))}
+          </div>
+
+          {/* Pagination Controls (only show if more than one page) */}
+          {totalPages > 1 && (
+            <div className="pagination">
+              <span className="pagination-info">
+                Showing {startIndex + 1}-{endIndex} of {filteredJobs.length}
+              </span>
+              <div className="pagination-controls">
+                <button
+                  className="pagination-btn"
+                  onClick={() => setCurrentPage(1)}
+                  disabled={currentPage === 1}
+                  title="First page"
+                >
+                  ««
+                </button>
+                <button
+                  className="pagination-btn"
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  title="Previous page"
+                >
+                  «
+                </button>
+                <span className="pagination-pages">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  className="pagination-btn"
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  title="Next page"
+                >
+                  »
+                </button>
+                <button
+                  className="pagination-btn"
+                  onClick={() => setCurrentPage(totalPages)}
+                  disabled={currentPage === totalPages}
+                  title="Last page"
+                >
+                  »»
+                </button>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   )

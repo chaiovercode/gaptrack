@@ -17,6 +17,13 @@ import {
   saveDataType,
   getDefaultData
 } from '../../services/storage/fileSystem'
+import {
+  storeDirectoryHandle,
+  getStoredDirectoryHandle,
+  verifyHandlePermission,
+  removeDirectoryHandle,
+  isIndexedDBSupported
+} from '../../services/storage/indexedDB'
 
 const STORAGE_KEY = 'gaptrack-data'
 const HAS_FOLDER_KEY = 'gaptrack-has-folder'
@@ -54,9 +61,51 @@ export function useStorage() {
   const initializeStorage = async () => {
     setIsLoading(true)
     setError(null)
-    setStorageType('localStorage')
 
-    // Always use localStorage - simple and reliable
+    // Try to restore File System handle from IndexedDB
+    if (isFileSystemSupported() && isIndexedDBSupported()) {
+      try {
+        const storedHandle = await getStoredDirectoryHandle()
+
+        if (storedHandle) {
+          // Verify we still have permission
+          const hasPermission = await verifyHandlePermission(storedHandle)
+
+          if (hasPermission) {
+            // Successfully restored - read data from folder
+            console.log('File System handle restored from IndexedDB')
+            setDirHandle(storedHandle)
+            dirHandleRef.current = storedHandle
+            setStorageType('fileSystem')
+            storageTypeRef.current = 'fileSystem'
+
+            const readResult = await readAllData(storedHandle)
+            const flatData = convertToFlatData(readResult.data)
+            setData(flatData)
+            dataRef.current = flatData
+            // Also cache in localStorage for fallback
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(flatData))
+            setNeedsReconnect(false)
+            setIsLoading(false)
+            return
+          } else {
+            // Handle exists but permission denied - need reconnect
+            console.log('File System permission denied - need reconnect')
+            setNeedsReconnect(true)
+            // Load cached data from localStorage
+            loadFromLocalStorage()
+            setStorageType('localStorage')
+            setIsLoading(false)
+            return
+          }
+        }
+      } catch (error) {
+        console.error('Error restoring File System handle:', error)
+      }
+    }
+
+    // No stored handle or error - use localStorage
+    setStorageType('localStorage')
     loadFromLocalStorage()
     setIsLoading(false)
   }
@@ -81,7 +130,13 @@ export function useStorage() {
       return { success: false, error: result.error }
     }
 
+    // Store handle in IndexedDB for persistence across refreshes
+    await storeDirectoryHandle(result.handle)
+
     setDirHandle(result.handle)
+    dirHandleRef.current = result.handle
+    setStorageType('fileSystem')
+    storageTypeRef.current = 'fileSystem'
 
     // Initialize folder with default files
     await initializeFolder(result.handle)
@@ -94,6 +149,7 @@ export function useStorage() {
     // Convert to flat structure for compatibility
     const flatData = convertToFlatData(readResult.data)
     setData(flatData)
+    dataRef.current = flatData
     // Cache in localStorage for offline/reconnect scenarios
     localStorage.setItem(STORAGE_KEY, JSON.stringify(flatData))
     setNeedsReconnect(false)
@@ -121,7 +177,13 @@ export function useStorage() {
       return { success: false, error: result.error }
     }
 
+    // Store handle in IndexedDB for persistence across refreshes
+    await storeDirectoryHandle(result.handle)
+
     setDirHandle(result.handle)
+    dirHandleRef.current = result.handle
+    setStorageType('fileSystem')
+    storageTypeRef.current = 'fileSystem'
 
     // Read all data from folder
     const readResult = await readAllData(result.handle)
@@ -130,6 +192,7 @@ export function useStorage() {
 
     const flatData = convertToFlatData(readResult.data)
     setData(flatData)
+    dataRef.current = flatData
     // Cache in localStorage for offline/reconnect scenarios
     localStorage.setItem(STORAGE_KEY, JSON.stringify(flatData))
     setNeedsReconnect(false)
@@ -155,6 +218,15 @@ export function useStorage() {
    * Save all data
    */
   const save = useCallback(async (newData) => {
+    // Check if we are clearing data (e.g. resetting demo or app)
+    if (newData === null) {
+      setData(null)
+      dataRef.current = null
+      localStorage.removeItem(STORAGE_KEY)
+      // We don't delete files from disk, just clear our memory/cache of them
+      return { success: true }
+    }
+
     const dataToSave = {
       ...newData,
       updatedAt: new Date().toISOString()
@@ -325,6 +397,7 @@ export function useStorage() {
     error,
     storageType,
     needsSetup: !hasCompletedSetup,
+    needsReconnect,
     setupFileStorage,
     openExistingFile,
     save,

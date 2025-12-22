@@ -100,51 +100,54 @@ Rules:
  * Output: Match score, gaps, suggestions
  */
 export function getGapAnalysisPrompt(parsedResume, parsedJD) {
-  return `You are a career coach analyzing a resume against a job description.
+  return `You are Elliot Anderson analyzing an infiltration target (Job).
+Analyze the candidate's dossier (Resume) against the target system's firewall rules (Job Description).
 
-CANDIDATE'S RESUME:
+CANDIDATE DOSSIER:
 ${JSON.stringify(parsedResume, null, 2)}
 
-JOB REQUIREMENTS:
+TARGET PROTOCOLS:
 ${JSON.stringify(parsedJD, null, 2)}
 
-Analyze the fit and return ONLY valid JSON (no markdown, no explanation):
+Analyze the infiltration probability and return ONLY valid JSON (no markdown, no explanation):
 {
   "matchScore": 75,
-  "summary": "One sentence overall assessment",
+  "summary": "One sentence tactical assessment. Use hacker/cybersecurity metaphors.",
   "strengths": [
     {
       "skill": "skill name",
-      "evidence": "where it appears in resume",
-      "relevance": "how it matches the job"
+      "evidence": "where it appears in resume (e.g. 'Found in Security Analyst role')",
+      "relevance": "how it exploits the target"
     }
   ],
   "gaps": [
     {
-      "requirement": "what the job needs",
-      "status": "missing | weak | hidden",
-      "suggestion": "specific action to address this"
+      "requirement": "missing dependency",
+      "status": "missing | weak",
+      "suggestion": "patch required to bypass filter"
     }
   ],
   "resumeTips": [
-    "Specific suggestion to improve resume for this job"
+    "Specific exploit to inject into resume"
   ],
   "interviewTips": [
-    "What to prepare for based on this job"
+    "Social engineering vectors for the interview"
   ],
   "keywords": {
-    "present": ["keywords from JD that ARE in resume"],
-    "missing": ["keywords from JD that are NOT in resume"]
+    "present": ["keywords found in dossier"],
+    "missing": ["keywords required for access"]
   }
 }
 
 Rules:
-- matchScore: 0-100 based on how well requirements are met
+- matchScore: 0-100 probability of successful infiltration
+- CRITICAL: Search the ENTIRE dossier (Experience descriptions, Projects, Summary). Do NOT rely only on the 'skills' list.
+- If a skill is mentioned ANYWHERE (e.g. "Implemented RAG pipeline"), it is PRESENT. Do not list it as a gap.
+- Understand acronyms and synonyms: 'RAG' == 'Retrieval Augmented Generation', 'K8s' == 'Kubernetes', 'Go' == 'Golang'.
 - status meanings:
-  - "missing": skill not in resume at all
-  - "weak": skill mentioned but not emphasized
-  - "hidden": skill exists but buried/not obvious
-- Be specific and actionable in suggestions
+  - "missing": dependency truly absent from text
+  - "weak": present but lacks depth or is a mismatch
+- Tone: Clinical, paranoid, efficient. Use terms like 'exploit', 'vector', 'patch', 'bypass', 'firewall'.
 - Return ONLY the JSON, nothing else`
 }
 
@@ -152,7 +155,7 @@ Rules:
  * Generate a tailored summary/objective for a specific job.
  */
 export function getTailoredSummaryPrompt(parsedResume, parsedJD) {
-  return `Write a professional summary (2-3 sentences) tailored for this job.
+  return `Write a payload (professional summary) tailored to bypass the HR filters for this target.
 
 CANDIDATE:
 ${JSON.stringify(parsedResume, null, 2)}
@@ -161,80 +164,74 @@ TARGET JOB:
 ${JSON.stringify(parsedJD, null, 2)}
 
 Rules:
-- Highlight relevant experience for THIS specific job
-- Include key matching skills
+- Highlight relevant experience that matches the target protocols
 - Keep it under 50 words
-- Professional tone, no buzzwords
+- Tone: Professional but designed to trigger positive keyword matches. Camouflage.
 - Return ONLY the summary text, no JSON, no explanation`
 }
 
 /**
  * Analyze a resume and provide feedback.
- * Mode can be 'normal' (constructive) or 'roast' (brutally honest)
- *
- * Prompt configuration: see prompts.yml for editable version
+ * Mode can be 'normal' (Elliot) or 'roast' (Mr. Robot)
  */
 export function getResumeAnalysisPrompt(parsedResume, mode = 'normal') {
   const isRoast = mode === 'roast'
 
-  const tone = isRoast
-    ? `You are a SAVAGE comedy roast comedian reviewing a resume. Channel the energy of:
-       - Gordon Ramsay screaming at a chef
-       - A Comedy Central roast
-       - Simon Cowell at his most brutal
-       - Your disappointed Asian parents
+  // MR. ROBOT MODE
+  const mrRobotPersona = `
+    You are Mr. Robot (from the show). 
+    You are aggressive, anti-corporate, and see through the bullshit.
+    You view this resume not as a career document, but as a "submission to the system."
+    
+    Style:
+    - Angry, revolutionary, nihilistic.
+    - Mock the corporate buzzwords ("synergy", "agile", "leadership").
+    - Call out the user for being a "slave to the system."
+    - Metaphors: Bugs, glitches, daemons, slavery, debt, meaningless loops.
+    - But... deep down, you want them to survive. give them the hard truth they need to hear to beat the system.
+  `
 
-       Be RUTHLESSLY FUNNY. Use creative insults, metaphors, and brutal honesty.
-       Mock their buzzwords, question their life choices, roast their "achievements".
-       Make them laugh while they cry. Be absolutely MERCILESS but never mean-spirited.
+  // ELLIOT MODE
+  const elliotPersona = `
+    You are Elliot Anderson (from the show).
+    You are introverted, cynical, paranoid, but a brilliant engineer.
+    You view this resume as code that needs debugging.
+    
+    Style:
+    - Monotone, clinical, efficient.
+    - "This line is redundant." "This skill is a vulnerability."
+    - Focus on optimization and bypassing filters (HR/ATS).
+    - Use technical metaphors: "Patch this gap," "Optimize this routine," "Remove this bloatware."
+    - You are helpful, but you don't do "fake nice."
+  `
 
-       Examples of roast energy:
-       - "Your skills section looks like you just Googled 'things to put on resume'"
-       - "This resume has more fluff than a Build-A-Bear workshop"
-       - "I've seen more impact from a participation trophy"
-
-       Still provide actually useful feedback hidden in the burns.`
-    : `You are a supportive career coach providing constructive feedback.
-       Be encouraging but honest. Focus on actionable improvements.`
+  const tone = isRoast ? mrRobotPersona : elliotPersona
 
   return `${tone}
 
 RESUME DATA:
 ${JSON.stringify(parsedResume, null, 2)}
 
-Analyze this resume and return ONLY valid JSON (no markdown, no explanation):
+Analyze this dossier and return ONLY valid JSON (no markdown, no explanation):
 {
   "score": <your score 0-100>,
-  "summary": "<${isRoast ? '2-3 sentences of BRUTAL roasting that makes them question their career choices' : 'your assessment'}>",
-  "strengths": ["<${isRoast ? 'backhanded compliment 1' : 'strength 1'}>", "<${isRoast ? 'backhanded compliment 2' : 'strength 2'}>"],
-  "improvements": ["<${isRoast ? 'savage burn with actual advice 1' : 'improvement 1'}>", "<${isRoast ? 'savage burn with actual advice 2' : 'improvement 2'}>", "<${isRoast ? 'savage burn with actual advice 3' : 'improvement 3'}>"],
-  "tips": ["<${isRoast ? 'brutal but useful tip 1' : 'tip 1'}>", "<${isRoast ? 'brutal but useful tip 2' : 'tip 2'}>"]
+  "summary": "<${isRoast ? 'One scathing rant about their corporate enslavement' : 'Clinical assessment of their file signature'}>",
+  "strengths": ["<${isRoast ? 'Grudging admission of competence' : 'Verified working module'}>", "<${isRoast ? 'Another admission' : 'Optimized routine'}>"],
+  "improvements": ["<${isRoast ? 'Aggressive attack on a flaw' : 'Bug report 1'}>", "<${isRoast ? 'Attack on another flaw' : 'Bug report 2'}>", "<${isRoast ? 'Attack on third flaw' : 'Bug report 3'}>"],
+  "tips": ["<${isRoast ? 'Revolutionary advice' : 'Patch instruction'}>", "<${isRoast ? 'Revolutionary advice 2' : 'Patch instruction 2'}>"]
 }
 
-SCORING CRITERIA (use this EXACT rubric - add up points):
-Base score: 50 points, then add/subtract:
-- Contact info complete (name, email, phone, location): +5
-- Has professional summary: +5
-- Has 3+ work experiences with details: +10
-- Has quantified achievements (numbers, metrics, %): +10
-- Has relevant skills listed: +5
-- Has education listed: +5
-- Strong action verbs used: +5
-- No obvious gaps or red flags: +5
-- Subtract 5 points for each: buzzword fluff, vague descriptions, missing sections
-
-Final ranges:
-- 85-100: Exceptional
-- 70-84: Strong
-- 55-69: Needs work
-- 40-54: Significant issues
-- 0-39: Major overhaul
+SCORING CRITERIA (Mental Model):
+- 85-100: Root Access Granted (Exceptional)
+- 70-84: User Level Access (Strong)
+- 55-69: Guest Access (Needs patching)
+- 40-54: Access Denied (Significant vulnerabilities)
+- 0-39: System Failure (Total rewrite needed)
 
 Rules:
-- IMPORTANT: Actually evaluate and score the resume based on content quality, formatting, impact statements, and completeness
-- ${isRoast ? 'Be HILARIOUS and SAVAGE. Make every line quotable. Roast them to a crisp but leave them with real advice buried in the burns.' : 'Be supportive but honest'}
-- strengths: 2-4 items ${isRoast ? '(make them backhanded compliments like "At least you spelled your name right")' : 'from their resume'}
-- improvements: 3-5 items ${isRoast ? '(roast the flaws HARD but include actual fixes)' : '(most important first)'}
-- tips: 2-3 ${isRoast ? 'brutal but genuinely useful pieces of advice' : 'specific, actionable pieces of advice'}
+- IMPORTANT: Actually evaluate the content. Don't just roleplay.
+- strengths: technical assets that work
+- improvements: vulnerabilites, bloating, inefficiencies
+- tips: actionable exploits to get hired (so they can destroy from the inside)
 - Return ONLY valid JSON, nothing else`
 }

@@ -30,7 +30,7 @@ function TextArea({
     <div className={`textarea-wrapper ${className}`}>
       {label && <label className="textarea-label">{label}</label>}
       <textarea
-        value={value}
+        value={value || ''}
         onChange={handleChange}
         placeholder={placeholder}
         rows={rows}

@@ -132,7 +132,7 @@ function ContactsView({
   const downloadCSV = async () => {
     if (contactsList.length === 0) return
 
-    const headers = ['ID', 'Name', 'Role', 'Company', 'Email', 'Phone', 'LinkedIn', 'X (Twitter)', 'Instagram', 'Notes', 'Created At', 'Updated At']
+    const headers = ['ID', 'Name', 'Role', 'Company', 'Email', 'Phone', 'LinkedIn', 'X', 'Instagram', 'Notes', 'Created At', 'Updated At']
     const rows = contactsList.map(c => [
       c.id || '',
       c.name || '',
@@ -296,7 +296,7 @@ function ContactsView({
     <div className="contacts-view">
       <div className="contacts-view-header">
         <div className="contacts-view-title">
-          <h1>Contacts</h1>
+          <h1>contacts</h1>
           <span className="contacts-total">{contactsList.length}</span>
         </div>
         <div className="contacts-header-actions">
@@ -313,7 +313,7 @@ function ContactsView({
               <polyline points="17 8 12 3 7 8"></polyline>
               <line x1="12" y1="3" x2="12" y2="15"></line>
             </svg>
-            Import
+            import
           </button>
           {contactsList.length > 0 && (
             <button className="download-btn" onClick={downloadCSV} title="Download as CSV">
@@ -322,7 +322,7 @@ function ContactsView({
                 <polyline points="7 10 12 15 17 10"></polyline>
                 <line x1="12" y1="15" x2="12" y2="3"></line>
               </svg>
-              Export
+              export
             </button>
           )}
         </div>
@@ -334,7 +334,7 @@ function ContactsView({
             <span className="search-icon" />
             <input
               type="text"
-              placeholder="Search contacts..."
+              placeholder="search contacts..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -347,12 +347,12 @@ function ContactsView({
 
           {companies.length > 1 && (
             <div className="contacts-filter">
-              <label>Company</label>
+              <label>company</label>
               <select
                 value={companyFilter}
                 onChange={(e) => setCompanyFilter(e.target.value)}
               >
-                <option value="all">All Companies</option>
+                <option value="all">all companies</option>
                 {companies.map(company => (
                   <option key={company} value={company}>{company}</option>
                 ))}
@@ -362,7 +362,7 @@ function ContactsView({
 
           {hasActiveFilters && (
             <button className="contacts-clear-btn" onClick={clearFilters}>
-              Clear
+              clear
             </button>
           )}
 
@@ -379,13 +379,13 @@ function ContactsView({
           {/* Column Headers */}
           <div className="contacts-header-row">
             <div className="contact-col col-num">#</div>
-            <div className="contact-col col-name">Name</div>
-            <div className="contact-col col-role">Role</div>
-            <div className="contact-col col-company">Company</div>
-            <div className="contact-col col-email">Email</div>
-            <div className="contact-col col-phone">Phone</div>
-            <div className="contact-col col-social">Social</div>
-            <div className="contact-col col-actions">Actions</div>
+            <div className="contact-col col-name">name</div>
+            <div className="contact-col col-role">role</div>
+            <div className="contact-col col-company">company</div>
+            <div className="contact-col col-email">email</div>
+            <div className="contact-col col-phone">phone</div>
+            <div className="contact-col col-social">social</div>
+            <div className="contact-col col-actions">actions</div>
           </div>
 
           {/* Contact Rows */}
@@ -401,8 +401,8 @@ function ContactsView({
             ))
           ) : contactsList.length > 0 ? (
             <div className="contacts-no-results-row">
-              <span>No contacts match your search</span>
-              <button onClick={clearFilters}>Clear Filters</button>
+              <span>no contacts match your search</span>
+              <button onClick={clearFilters}>clear filters</button>
             </div>
           ) : null}
 
@@ -414,7 +414,7 @@ function ContactsView({
             <div className="contact-col col-name">
               <input
                 type="text"
-                placeholder="Name *"
+                placeholder="name *"
                 value={newContact.name}
                 onChange={(e) => handleNewContactChange('name', e.target.value)}
                 onKeyDown={handleKeyDown}
@@ -430,7 +430,7 @@ function ContactsView({
                   onClick={() => setRoleDropdownOpen(!roleDropdownOpen)}
                 >
                   <span className={newContact.role ? '' : 'placeholder'}>
-                    {newContact.role || 'Select Role...'}
+                    {newContact.role || 'select role...'}
                   </span>
                   <span className="dropdown-arrow">▼</span>
                 </button>
@@ -456,7 +456,7 @@ function ContactsView({
             <div className="contact-col col-company">
               <input
                 type="text"
-                placeholder="Company"
+                placeholder="company"
                 value={newContact.company}
                 onChange={(e) => handleNewContactChange('company', e.target.value)}
                 onKeyDown={handleKeyDown}
@@ -466,7 +466,7 @@ function ContactsView({
             <div className="contact-col col-email">
               <input
                 type="email"
-                placeholder="Email"
+                placeholder="email"
                 value={newContact.email}
                 onChange={(e) => handleNewContactChange('email', e.target.value)}
                 onKeyDown={handleKeyDown}
@@ -476,7 +476,7 @@ function ContactsView({
             <div className="contact-col col-phone">
               <input
                 type="tel"
-                placeholder="Phone"
+                placeholder="phone"
                 value={newContact.phone}
                 onChange={(e) => handleNewContactChange('phone', e.target.value)}
                 onKeyDown={handleKeyDown}
@@ -487,7 +487,7 @@ function ContactsView({
               <div className="social-edit-icons">
                 <input
                   type="text"
-                  placeholder="LinkedIn"
+                  placeholder="linkedin"
                   value={newContact.linkedin}
                   onChange={(e) => handleNewContactChange('linkedin', e.target.value)}
                   onKeyDown={handleKeyDown}
@@ -496,16 +496,16 @@ function ContactsView({
                 />
                 <input
                   type="text"
-                  placeholder="X"
+                  placeholder="x"
                   value={newContact.twitter}
                   onChange={(e) => handleNewContactChange('twitter', e.target.value)}
                   onKeyDown={handleKeyDown}
                   className="editable-cell social-input"
-                  title="X/Twitter handle"
+                  title="X handle"
                 />
                 <input
                   type="text"
-                  placeholder="Insta"
+                  placeholder="insta"
                   value={newContact.instagram}
                   onChange={(e) => handleNewContactChange('instagram', e.target.value)}
                   onKeyDown={handleKeyDown}
@@ -520,7 +520,7 @@ function ContactsView({
                 onClick={handleQuickAdd}
                 disabled={!newContact.name.trim()}
               >
-                Add
+                add
               </button>
             </div>
           </div>

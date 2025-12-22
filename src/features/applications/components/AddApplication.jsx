@@ -9,6 +9,7 @@ import { Button, Input, TextArea, Toast } from '../../../shared/components'
 import './AddApplication.css'
 
 const STATUSES = [
+  { value: 'discovered', label: 'Targeted', color: '#94a3b8' },
   { value: 'applied', label: 'Applied', color: '#6366f1' },
   { value: 'screening', label: 'Screening', color: '#8b5cf6' },
   { value: 'interview', label: 'Interviewing', color: '#f59e0b' },
@@ -43,7 +44,7 @@ function AddApplication({
   const [location, setLocation] = useState('')
   const [workType, setWorkType] = useState('onsite')
   const [salary, setSalary] = useState('')
-  const [status, setStatus] = useState('applied')
+  const [status, setStatus] = useState('discovered')
   const [jobDescription, setJobDescription] = useState('')
   const [link, setLink] = useState('')
   const [notes, setNotes] = useState('')
@@ -70,7 +71,7 @@ function AddApplication({
       setLocation(job.location || '')
       setWorkType(job.workType || 'onsite')
       setSalary(job.salary || '')
-      setStatus(job.status || 'applied')
+      setStatus(job.status || 'discovered')
       setJobDescription(job.jobDescription || '')
       setLink(job.link || '')
       setNotes(job.notes || '')
@@ -84,27 +85,6 @@ function AddApplication({
 
   const handleJDPaste = async (pastedText) => {
     setJobDescription(pastedText)
-
-    if (pastedText.length >= MIN_PASTE_LENGTH && !autoParseTriggered) {
-      setAutoParseTriggered(true)
-
-      setTimeout(async () => {
-        const result = await onParseJD(pastedText)
-        if (result.success && result.data) {
-          applyParsedData(result.data)
-          setShowDetails(true)
-
-          if (resume && analyzeGap) {
-            setAnalyzingMatch(true)
-            const gapResult = await analyzeGap(resume, result.data)
-            if (gapResult.success) {
-              setMatchPreview(gapResult.data)
-            }
-            setAnalyzingMatch(false)
-          }
-        }
-      }, 100)
-    }
   }
 
   const applyParsedData = (data) => {
@@ -118,6 +98,7 @@ function AddApplication({
   const handleManualParse = async () => {
     if (!jobDescription.trim()) return
 
+    // Trigger parse manually
     const result = await onParseJD(jobDescription)
     if (result.success && result.data) {
       applyParsedData(result.data)
@@ -146,7 +127,7 @@ function AddApplication({
     e.preventDefault()
 
     if (!company.trim() || !role.trim()) {
-      setToast({ message: 'Company and Role are required', type: 'error' })
+      setToast({ message: 'company and role are required', type: 'error' })
       return
     }
 
@@ -177,8 +158,11 @@ function AddApplication({
             <div className="processing-ring"></div>
             <div className="processing-ring"></div>
           </div>
-          <h3>Analyzing Job Description</h3>
-          <p>Extracting requirements, skills, and keywords...</p>
+          <h3>decoding their requirements</h3>
+          <p>extracting what they actually want vs what they say they want...</p>
+          <Button variant="outline" onClick={onCancel} style={{ marginTop: '2rem' }}>
+            abort_process
+          </Button>
         </div>
       </div>
     )
@@ -202,54 +186,50 @@ function AddApplication({
       )}
 
       <form className="add-app-form" onSubmit={handleSubmit}>
-        {/* Hero Paste Area */}
-        <div className="paste-hero">
-          <div className="paste-hero-header">
-            <div className="paste-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
-                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
-              </svg>
+        {/* Hero Paste Area - only show when adding new */}
+        {!job && (
+          <div className="paste-hero">
+            <div className="paste-hero-header">
+              <div className="paste-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                  <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+                </svg>
+              </div>
+              <div>
+                <h3>paste their job posting</h3>
+                <p>let me decode what they're really looking for</p>
+              </div>
             </div>
-            <div>
-              <h3>Paste Job Description</h3>
-              <p>AI extracts company, role, requirements automatically</p>
+            <TextArea
+              className="paste-textarea"
+              placeholder="paste the job posting here...
+    
+the more detail, the better i can find your gaps before they do."
+              value={jobDescription}
+              onChange={handleJDPaste}
+              rows={5}
+            />
+
+            <div className="paste-actions" style={{ marginTop: '1rem', display: 'flex', justifyContent: 'flex-end' }}>
+              <Button
+                type="button"
+                variant="primary"
+                onClick={handleManualParse}
+                disabled={!jobDescription.trim() || isProcessing}
+              >
+                DECODE
+              </Button>
             </div>
+
+            {parsedJD && !isProcessing && (
+              <div className="paste-status success">
+                <span className="status-check">✓</span>
+                extracted
+              </div>
+            )}
           </div>
-          <TextArea
-            className="paste-textarea"
-            placeholder="Paste the full job posting from LinkedIn, Indeed, or company website...
-
-Example:
-About the role
-We're looking for a Senior Software Engineer to join our team...
-
-Requirements:
-- 5+ years of experience with React
-- Strong TypeScript skills
-..."
-            value={jobDescription}
-            onChange={handleJDPaste}
-            rows={5}
-          />
-          {jobDescription.length > 0 && jobDescription.length < MIN_PASTE_LENGTH && (
-            <div className="paste-hint">
-              Keep pasting... ({MIN_PASTE_LENGTH - jobDescription.length} more characters for auto-analysis)
-            </div>
-          )}
-          {isProcessing && (
-            <div className="paste-status analyzing">
-              <span className="status-dot"></span>
-              Analyzing job description...
-            </div>
-          )}
-          {parsedJD && !isProcessing && (
-            <div className="paste-status success">
-              <span className="status-check">✓</span>
-              Job details extracted successfully
-            </div>
-          )}
-        </div>
+        )}
 
         {/* Match Score Card */}
         {(matchPreview || analyzingMatch) && (
@@ -257,38 +237,75 @@ Requirements:
             {analyzingMatch ? (
               <div className="match-loading">
                 <div className="match-loading-bar"></div>
-                <span>Calculating your match score...</span>
+                <span>calculating match score...</span>
               </div>
             ) : (
               <>
-                <div className="match-score-display">
-                  <div
-                    className="match-score-circle"
+                <div className="match-header">
+                  <span
+                    className="match-score-value"
                     style={{
-                      '--score': matchPreview.matchScore,
-                      '--color': matchPreview.matchScore >= 70
-                        ? 'var(--color-success)'
+                      '--score-color': matchPreview.matchScore >= 70
+                        ? '#10b981'
                         : matchPreview.matchScore >= 50
-                        ? 'var(--color-warning)'
-                        : 'var(--color-error)'
+                          ? '#f59e0b'
+                          : '#A9070E'
                     }}
                   >
-                    <span className="score-number">{matchPreview.matchScore}</span>
-                    <span className="score-percent">%</span>
-                  </div>
+                    {matchPreview.matchScore}%
+                  </span>
                   <div className="match-details">
                     <h4>
-                      {matchPreview.matchScore >= 70 ? 'Strong Match!' :
-                       matchPreview.matchScore >= 50 ? 'Good Potential' : 'Stretch Role'}
+                      {matchPreview.matchScore >= 70 ? 'you\'re in good shape' :
+                        matchPreview.matchScore >= 50 ? 'survivable odds' : 'uphill battle'}
                     </h4>
                     <p>{matchPreview.summary}</p>
-                    {matchPreview.gaps?.length > 0 && (
-                      <div className="match-gaps-count">
-                        <span className="gap-dot"></span>
-                        {matchPreview.gaps.length} skill gap{matchPreview.gaps.length !== 1 ? 's' : ''} to address
-                      </div>
-                    )}
                   </div>
+                </div>
+
+                {/* Gap Analysis Details */}
+                <div className="gap-analysis-grid">
+                  {matchPreview.strengths?.length > 0 && (
+                    <div className="gap-analysis-card strengths">
+                      <div className="gap-analysis-header">
+                        <span className="gap-icon">✓</span>
+                        <h5>what you've got</h5>
+                        <span className="gap-count">{matchPreview.strengths.length}</span>
+                      </div>
+                      <ul className="gap-list">
+                        {matchPreview.strengths.slice(0, 5).map((s, i) => (
+                          <li key={i}>
+                            <span className="gap-skill">{s.skill}</span>
+                            {s.relevance && <span className="gap-relevance">{s.relevance}</span>}
+                          </li>
+                        ))}
+                        {matchPreview.strengths.length > 5 && (
+                          <li className="gap-more">+{matchPreview.strengths.length - 5} more</li>
+                        )}
+                      </ul>
+                    </div>
+                  )}
+
+                  {matchPreview.gaps?.length > 0 && (
+                    <div className="gap-analysis-card gaps">
+                      <div className="gap-analysis-header">
+                        <span className="gap-icon">!</span>
+                        <h5>what they'll reject you for</h5>
+                        <span className="gap-count">{matchPreview.gaps.length}</span>
+                      </div>
+                      <ul className="gap-list">
+                        {matchPreview.gaps.slice(0, 5).map((g, i) => (
+                          <li key={i}>
+                            <span className="gap-skill">{g.requirement}</span>
+                            {g.suggestion && <span className="gap-relevance">{g.suggestion}</span>}
+                          </li>
+                        ))}
+                        {matchPreview.gaps.length > 5 && (
+                          <li className="gap-more">+{matchPreview.gaps.length - 5} more</li>
+                        )}
+                      </ul>
+                    </div>
+                  )}
                 </div>
               </>
             )}
@@ -298,37 +315,37 @@ Requirements:
         {/* Job Details Section */}
         <div className={`details-section ${showDetails || job ? 'show' : ''}`}>
           <div className="section-header">
-            <h4>Job Details</h4>
-            {parsedJD && <span className="auto-filled-badge">Auto-filled</span>}
+            <h4>job details</h4>
+            {parsedJD && <span className="auto-filled-badge">auto-filled</span>}
           </div>
 
           <div className="form-grid">
             <div className="form-field">
-              <label>Company <span className="required">*</span></label>
+              <label>company <span className="required">*</span></label>
               <Input
-                placeholder="Google, Meta, Stripe..."
+                placeholder="company name..."
                 value={company}
                 onChange={(v) => { manualEdits.current.company = true; setCompany(v) }}
               />
             </div>
             <div className="form-field">
-              <label>Role <span className="required">*</span></label>
+              <label>role <span className="required">*</span></label>
               <Input
-                placeholder="Senior Software Engineer"
+                placeholder="job title..."
                 value={role}
                 onChange={(v) => { manualEdits.current.role = true; setRole(v) }}
               />
             </div>
             <div className="form-field">
-              <label>Location</label>
+              <label>location</label>
               <Input
-                placeholder="San Francisco, NYC, London..."
+                placeholder="city, remote..."
                 value={location}
                 onChange={(v) => { manualEdits.current.location = true; setLocation(v) }}
               />
             </div>
             <div className="form-field">
-              <label>Work Type</label>
+              <label>work type</label>
               <div className="worktype-pills">
                 {WORK_TYPES.map((w) => (
                   <button
@@ -345,7 +362,7 @@ Requirements:
               </div>
             </div>
             <div className="form-field">
-              <label>Salary</label>
+              <label>salary</label>
               <Input
                 placeholder="$150k - $200k"
                 value={salary}
@@ -356,7 +373,7 @@ Requirements:
 
           {/* Status Pills */}
           <div className="form-field">
-            <label>Status</label>
+            <label>status</label>
             <div className="status-pills">
               {STATUSES.map((s) => (
                 <button
@@ -375,9 +392,9 @@ Requirements:
 
           {/* Job Link */}
           <div className="form-field">
-            <label>Job Posting URL</label>
+            <label>job posting url</label>
             <Input
-              placeholder="https://linkedin.com/jobs/view/..."
+              placeholder="https://..."
               value={link}
               onChange={setLink}
             />
@@ -388,7 +405,7 @@ Requirements:
         {parsedJD && (
           <div className="requirements-section">
             <div className="section-header">
-              <h4>Extracted Requirements</h4>
+              <h4>extracted requirements</h4>
             </div>
 
             <div className="requirements-grid">
@@ -396,7 +413,7 @@ Requirements:
                 <div className="requirement-card must-have">
                   <h5>
                     <span className="req-icon">!</span>
-                    Must Have
+                    must have
                   </h5>
                   <ul>
                     {parsedJD.requirements.mustHave.map((req, i) => (
@@ -409,7 +426,7 @@ Requirements:
                 <div className="requirement-card nice-to-have">
                   <h5>
                     <span className="req-icon">+</span>
-                    Nice to Have
+                    nice to have
                   </h5>
                   <ul>
                     {parsedJD.requirements.niceToHave.map((req, i) => (
@@ -422,7 +439,7 @@ Requirements:
 
             {parsedJD.keywords?.length > 0 && (
               <div className="keywords-row">
-                <span className="keywords-label">Keywords:</span>
+                <span className="keywords-label">keywords:</span>
                 <div className="keyword-tags">
                   {parsedJD.keywords.slice(0, 8).map((kw, i) => (
                     <span key={i} className="keyword-tag">{kw}</span>
@@ -437,8 +454,8 @@ Requirements:
         {contacts.length > 0 && (
           <div className="contacts-section">
             <div className="section-header">
-              <h4>Link Contacts</h4>
-              <span className="section-hint">People connected to this opportunity</span>
+              <h4>link contacts</h4>
+              <span className="section-hint">your inside connections</span>
             </div>
             <div className="contact-list">
               {contacts.map(contact => (
@@ -467,10 +484,10 @@ Requirements:
         {/* Notes Section */}
         <div className="notes-section">
           <div className="section-header">
-            <h4>Notes</h4>
+            <h4>notes</h4>
           </div>
           <TextArea
-            placeholder="Interview prep notes, referral info, follow-up reminders..."
+            placeholder="intel, observations, red flags..."
             value={notes}
             onChange={setNotes}
             rows={3}
@@ -481,11 +498,11 @@ Requirements:
         <div className="form-actions">
           {onCancel && (
             <Button type="button" variant="outline" onClick={onCancel}>
-              Cancel
+              cancel
             </Button>
           )}
           <Button type="submit" variant="primary">
-            {job ? 'Update Application' : 'Add Application'}
+            {job ? 'update' : 'add target'}
           </Button>
         </div>
       </form>

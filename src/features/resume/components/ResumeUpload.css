@@ -13,7 +13,7 @@
 /* Tab Switcher */
 .upload-tabs {
   display: flex;
-  border: var(--border-width-thick) solid var(--color-text);
+  border: 2px solid var(--color-border);
   border-radius: var(--radius-md);
   overflow: hidden;
 }
@@ -23,23 +23,26 @@
   padding: var(--space-3) var(--space-4);
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-bold);
-  background: var(--color-surface);
+  background: transparent;
+  color: var(--color-text-muted);
   border: none;
   cursor: pointer;
   transition: all var(--transition-fast);
+  text-transform: uppercase;
 }
 
 .upload-tab:not(:last-child) {
-  border-right: var(--border-width-thick) solid var(--color-text);
+  border-right: 2px solid var(--color-border);
 }
 
 .upload-tab:hover {
-  background: var(--color-border);
+  background: var(--color-surface-hover);
+  color: var(--color-text);
 }
 
 .upload-tab.active {
-  background: var(--color-text);
-  color: var(--color-surface);
+  background: var(--color-primary);
+  color: white;
 }
 
 /* Drop Zone */
@@ -130,7 +133,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Error State */

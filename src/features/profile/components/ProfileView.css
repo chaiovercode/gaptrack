@@ -55,7 +55,6 @@
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   font-family: var(--font-family);
-  text-transform: uppercase;
   letter-spacing: 0.5px;
   background: var(--color-bg-elevated);
   border: none;
@@ -216,7 +215,6 @@
 .stat-label {
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
-  text-transform: uppercase;
   letter-spacing: 0.5px;
   color: var(--color-text-muted);
   margin-top: var(--space-1);
@@ -233,8 +231,7 @@
   margin: 0 0 var(--space-3) 0;
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-bold);
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   color: var(--color-text-muted);
   padding-bottom: var(--space-2);
   border-bottom: 1px solid var(--color-border);
@@ -340,13 +337,19 @@
 }
 
 /* Collapsible Block Header */
+.block-header-wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
 .block-header {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  width: 100%;
+  flex: 1;
   padding: 0;
-  margin-bottom: var(--space-4);
   padding-bottom: var(--space-3);
   border: none;
   border-bottom: 2px solid var(--color-border);
@@ -355,16 +358,79 @@
   font-family: var(--font-family);
   color: var(--color-text);
   transition: all var(--transition-fast);
+  position: relative;
 }
 
 .block-header:hover {
   color: var(--color-primary);
 }
 
+/* Remove margin from header when inside wrapper, handled by wrapper */
+.block-header-wrapper .block-header {
+  margin-bottom: 0;
+}
+
+/* Fallback for standalone headers */
+.resume-block:not(:has(.block-header-wrapper)) .block-header {
+  margin-bottom: var(--space-4);
+}
+
 .resume-block.collapsed .block-header {
   margin-bottom: 0;
   padding-bottom: 0;
   border-bottom: none;
+}
+
+.resume-block.collapsed .block-header-wrapper {
+  margin-bottom: 0;
+}
+
+/* Edit Button */
+.edit-section-btn {
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--font-size-xs);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  height: fit-content;
+  align-self: center;
+}
+
+.edit-section-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* Absolute Centering for H3 */
+.block-header h3 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.5px;
+
+  /* Absolute Centering */
+  position: absolute;
+  left: 0;
+  right: 0;
+  text-align: center;
+  pointer-events: none;
+  /* Let clicks pass */
+}
+
+/* Ensure other elements stay accessible and properly positioned */
+.block-icon,
+.block-toggle,
+.block-count {
+  position: relative;
+  z-index: 1;
+}
+
+.block-count {
+  margin-left: auto;
+  /* Push to right */
 }
 
 /* Block Count Badge */
@@ -412,6 +478,7 @@
     opacity: 0;
     transform: translateY(-8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -531,8 +598,7 @@ svg.block-icon {
   margin: 0;
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-bold);
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   flex: 1;
 }
 
@@ -576,7 +642,6 @@ svg.block-icon {
   padding: var(--space-1) var(--space-2);
   background: var(--color-accent);
   border: 1px solid var(--color-border);
-  text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
@@ -792,8 +857,15 @@ svg.block-icon {
 
 .resume-empty p,
 .contacts-empty p {
-  margin: 0 0 var(--space-4) 0;
-  color: var(--color-text-light);
+  margin: 0 0 var(--space-2) 0;
+  color: var(--color-text-secondary);
+}
+
+.resume-empty .empty-subtext {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-4);
+  font-style: italic;
 }
 
 /* Contacts Grid */
@@ -845,7 +917,6 @@ svg.block-icon {
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-bold);
   font-family: var(--font-family);
-  text-transform: uppercase;
   letter-spacing: 0.5px;
   background: var(--color-bg-elevated);
   border: none;
@@ -939,7 +1010,6 @@ svg.block-icon {
   margin: 0;
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
-  font-style: italic;
 }
 
 .analyze-btn {
@@ -980,7 +1050,6 @@ svg.block-icon {
 .analysis-mode-badge {
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-bold);
-  text-transform: uppercase;
   padding: var(--space-1) var(--space-3);
   background: var(--color-primary);
   color: var(--color-text-inverse);
@@ -1048,7 +1117,6 @@ svg.block-icon {
   margin: 0 0 var(--space-3) 0;
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-bold);
-  text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
@@ -1212,7 +1280,6 @@ svg.block-icon {
 .contacts-filter-group label {
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-bold);
-  text-transform: uppercase;
   letter-spacing: 0.5px;
   color: var(--color-text-muted);
 }
@@ -1239,7 +1306,6 @@ svg.block-icon {
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-bold);
   font-family: var(--font-family);
-  text-transform: uppercase;
   letter-spacing: 0.5px;
   background: transparent;
   border: 2px solid var(--color-border);
@@ -1546,4 +1612,57 @@ svg.block-icon {
   .score-value {
     font-size: 28px;
   }
+}
+
+/* === EDIT MODE === */
+.block-header-wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.block-header-wrapper .block-header {
+  flex: 1;
+}
+
+.edit-section-btn {
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  font-family: var(--font-family);
+  background: transparent;
+  border: 2px solid var(--color-border);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.edit-section-btn:hover {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
+}
+
+.edit-mode {
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+}
+
+.edit-mode textarea {
+  width: 100%;
+  font-family: var(--font-family);
+}
+
+.edit-hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin-top: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.edit-actions {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
 }

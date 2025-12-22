@@ -3,6 +3,7 @@ import html2canvas from 'html2canvas'
 import './FunnelView.css'
 
 const STATUS_COLS = [
+  { id: 'discovered', label: 'Targeted', color: '#94a3b8' },
   { id: 'applied', label: 'Applied', color: '#6366f1' },
   { id: 'screening', label: 'Screening', color: '#8b5cf6' },
   { id: 'interview', label: 'Interview', color: '#f59e0b' },
@@ -84,7 +85,7 @@ const FunnelView = forwardRef(function FunnelView({ jobs = [], onEditJob }, ref)
     STATUS_COLS.forEach(col => map[col.id] = [])
     locJobs.forEach(job => {
       if (map[job.status]) map[job.status].push(job)
-      else if (map['applied']) map['applied'].push(job)
+      else if (map['discovered']) map['discovered'].push(job)
     })
     return { map }
   }
@@ -298,6 +299,9 @@ const FunnelView = forwardRef(function FunnelView({ jobs = [], onEditJob }, ref)
   }
 
 
+  // SVG dimensions state
+  const [svgDimensions, setSvgDimensions] = useState({ width: 0, height: 0 })
+
   // --- SVG Drawing (Sankey Links) ---
   useLayoutEffect(() => {
     const drawPaths = () => {
@@ -306,6 +310,11 @@ const FunnelView = forwardRef(function FunnelView({ jobs = [], onEditJob }, ref)
       const newPaths = []
       const containerRect = containerRef.current.getBoundingClientRect()
       const totalJobs = jobs.length
+
+      // Update SVG dimensions to match scroll content
+      const scrollWidth = containerRef.current.scrollWidth
+      const scrollHeight = containerRef.current.scrollHeight
+      setSvgDimensions({ width: scrollWidth, height: scrollHeight })
 
       // Helper to calc curve
       const addCurve = (startEl, endEl, color, count, totalBase, key) => {
@@ -326,7 +335,8 @@ const FunnelView = forwardRef(function FunnelView({ jobs = [], onEditJob }, ref)
           y: eRect.top + eRect.height / 2 - containerRect.top + scrollTop
         }
 
-        const thickness = getLinkThickness(count, totalBase)
+        // Constrain link thickness to reasonable range
+        const thickness = Math.max(3, Math.min(20, getLinkThickness(count, totalBase)))
         const cp1x = startPt.x + (endPt.x - startPt.x) * 0.5
         const cp2x = endPt.x - (endPt.x - startPt.x) * 0.5
 
@@ -421,17 +431,40 @@ const FunnelView = forwardRef(function FunnelView({ jobs = [], onEditJob }, ref)
       setSvgPaths(newPaths)
     }
 
+    // Debounced scroll handler for performance
+    let scrollTimeout
+    const handleScroll = () => {
+      if (scrollTimeout) clearTimeout(scrollTimeout)
+      scrollTimeout = setTimeout(drawPaths, 16) // ~60fps
+    }
+
     // Use setTimeout to ensure DOM has fully settled after layout changes
     const timerId = setTimeout(drawPaths, 50)
 
     // Redraw on scroll since paths are relative to scroll position
     const container = containerRef.current
-    const handleScroll = () => drawPaths()
     container?.addEventListener('scroll', handleScroll)
+
+    // ResizeObserver to redraw paths on container resize
+    const resizeObserver = new ResizeObserver(() => {
+      if (scrollTimeout) clearTimeout(scrollTimeout)
+      scrollTimeout = setTimeout(drawPaths, 50)
+    })
+    if (container) resizeObserver.observe(container)
+
+    // Also listen to window resize
+    const handleResize = () => {
+      if (scrollTimeout) clearTimeout(scrollTimeout)
+      scrollTimeout = setTimeout(drawPaths, 100)
+    }
+    window.addEventListener('resize', handleResize)
 
     return () => {
       clearTimeout(timerId)
+      if (scrollTimeout) clearTimeout(scrollTimeout)
       container?.removeEventListener('scroll', handleScroll)
+      resizeObserver.disconnect()
+      window.removeEventListener('resize', handleResize)
     }
   }, [expandedWorkTypes, expandedLocations, expandedStatuses, jobs, jobsByType])
 
@@ -465,130 +498,142 @@ const FunnelView = forwardRef(function FunnelView({ jobs = [], onEditJob }, ref)
       )}
 
       <div className="sankey-view" ref={containerRef}>
-        <svg className="sankey-svg-layer">
-        {svgPaths.map(p => (
-          <path
-            key={p.key}
-            d={p.d}
-            stroke={p.stroke}
-            strokeWidth={p.strokeWidth}
-            className="sankey-path"
-          />
-        ))}
-      </svg>
-
-      {/* 1. Root Column */}
-      <div className="sankey-column">
-        <button
-          className={`sankey-node root-node ${hasAnyExpanded ? 'has-expanded' : ''}`}
-          ref={rootNodeRef}
-          onClick={collapseAll}
-          title={hasAnyExpanded ? 'Click to collapse all' : 'All jobs'}
+        <svg
+          className="sankey-svg-layer"
+          width={svgDimensions.width || '100%'}
+          height={svgDimensions.height || '100%'}
+          style={{
+            minWidth: svgDimensions.width || 'auto',
+            minHeight: svgDimensions.height || 'auto'
+          }}
         >
-          <span className="node-count">{jobs.length}</span>
-          <span className="node-label">All Jobs</span>
-        </button>
-      </div>
+          {svgPaths.map(p => (
+            <path
+              key={p.key}
+              d={p.d}
+              stroke={p.stroke}
+              strokeWidth={p.strokeWidth}
+              className="sankey-path"
+            />
+          ))}
+        </svg>
 
-      {/* 2. Work Type Column */}
-      <div className="sankey-column">
-        {WORK_TYPES.map(type => {
-          const count = jobsByType[type.id]?.length || 0
-          if (count === 0) return null
+        {/* 1. Root Column */}
+        <div className="sankey-column">
+          <button
+            className={`sankey-node root-node ${hasAnyExpanded ? 'has-expanded' : ''}`}
+            ref={rootNodeRef}
+            onClick={collapseAll}
+            title={hasAnyExpanded ? 'Click to collapse all' : 'All jobs'}
+          >
+            <span className="node-count">{jobs.length}</span>
+            <span className="node-label">All Jobs</span>
+          </button>
+        </div>
 
-          const isExpanded = expandedWorkTypes.has(type.id)
-          const locationData = getLocationsForType(type.id)
+        {/* 2. Work Type Column */}
+        <div className="sankey-column">
+          {WORK_TYPES.map(type => {
+            const count = jobsByType[type.id]?.length || 0
+            if (count === 0) return null
 
-          return (
-            <div key={type.id} className="sankey-branch-group">
-              <button
-                ref={el => typeRefs.current[type.id] = el}
-                className={`sankey-node type-node ${isExpanded ? 'expanded' : ''}`}
-                onClick={() => toggleWorkType(type.id)}
-                style={{ '--node-color': type.color }}
-              >
-                <span className="node-dot" style={{ background: type.color }} />
-                <span className="node-label">{type.label}</span>
-                <span className="node-count-badge">{count}</span>
-              </button>
+            const isExpanded = expandedWorkTypes.has(type.id)
+            const locationData = getLocationsForType(type.id)
 
-              {/* 3. Location Column (Only for expanded Work Type) */}
-              {isExpanded && (
-                <div className="sankey-sub-branch">
-                  {locationData.list.map(loc => {
-                    const locKey = `${type.id}:${loc}`
-                    const locCount = locationData.map[loc]?.length || 0
-                    const isLocExpanded = expandedLocations.has(locKey)
-                    const statusData = getStatusesForLocation(type.id, loc)
+            return (
+              <div key={type.id} className="sankey-branch-group">
+                <button
+                  ref={el => typeRefs.current[type.id] = el}
+                  className={`sankey-node type-node ${isExpanded ? 'expanded' : ''}`}
+                  onClick={() => toggleWorkType(type.id)}
+                  style={{ '--node-color': type.color }}
+                >
+                  <span className="node-dot" style={{ background: type.color }} />
+                  <span className="node-label">{type.label}</span>
+                  <span className="node-count-badge">{count}</span>
+                </button>
 
-                    return (
-                      <div key={loc} className="sankey-leaf-group">
-                        <button
-                          ref={el => locRefs.current[locKey] = el}
-                          className={`sankey-node location-node ${isLocExpanded ? 'expanded' : ''}`}
-                          onClick={() => toggleLocation(type.id, loc)}
-                        >
-                          <span className="node-label">{loc}</span>
-                          <span className="node-count-badge">{locCount}</span>
-                        </button>
+                {/* 3. Location Column (Only for expanded Work Type) */}
+                {isExpanded && (
+                  <div className="sankey-sub-branch">
+                    {locationData.list.map(loc => {
+                      const locKey = `${type.id}:${loc}`
+                      const locCount = locationData.map[loc]?.length || 0
+                      const isLocExpanded = expandedLocations.has(locKey)
+                      const statusData = getStatusesForLocation(type.id, loc)
 
-                        {/* 4. Status Column (Only for expanded Location) */}
-                        {isLocExpanded && (
-                          <div className="sankey-sub-branch status-column">
-                            {STATUS_COLS.map(col => {
-                              const statusJobs = statusData.map[col.id] || []
-                              if (statusJobs.length === 0) return null
-                              const statusKey = `${locKey}:${col.id}`
-                              const isStatusExpanded = expandedStatuses.has(statusKey)
+                      return (
+                        <div key={loc} className="sankey-leaf-group">
+                          <button
+                            ref={el => locRefs.current[locKey] = el}
+                            className={`sankey-node location-node ${isLocExpanded ? 'expanded' : ''}`}
+                            onClick={() => toggleLocation(type.id, loc)}
+                          >
+                            <span className="node-label">{loc}</span>
+                            <span className="node-count-badge">{locCount}</span>
+                          </button>
 
-                              return (
-                                <div key={col.id} className="sankey-leaf-group">
-                                  <button
-                                    ref={el => statusRefs.current[statusKey] = el}
-                                    className={`sankey-node status-node ${isStatusExpanded ? 'expanded' : ''}`}
-                                    onClick={() => toggleStatus(type.id, loc, col.id)}
-                                    style={{ '--node-color': col.color }}
-                                  >
-                                    <span className="node-dot" style={{ background: col.color }} />
-                                    <span className="node-label">{col.label}</span>
-                                    <span className="node-count-badge">{statusJobs.length}</span>
-                                  </button>
+                          {/* 4. Status Column (Only for expanded Location) */}
+                          {isLocExpanded && (
+                            <div className="sankey-sub-branch status-column">
+                              {STATUS_COLS.map(col => {
+                                const statusJobs = statusData.map[col.id] || []
+                                if (statusJobs.length === 0) return null
+                                const statusKey = `${locKey}:${col.id}`
+                                const isStatusExpanded = expandedStatuses.has(statusKey)
 
-                                  {/* 5. Job Cards */}
-                                  {isStatusExpanded && (
-                                    <div
-                                      className="sankey-jobs-list"
-                                      ref={el => jobListRefs.current[statusKey] = el}
+                                return (
+                                  <div key={col.id} className="sankey-leaf-group">
+                                    <button
+                                      ref={el => statusRefs.current[statusKey] = el}
+                                      className={`sankey-node status-node ${isStatusExpanded ? 'expanded' : ''}`}
+                                      onClick={() => toggleStatus(type.id, loc, col.id)}
+                                      style={{ '--node-color': col.color }}
                                     >
-                                      {statusJobs.map(job => (
-                                        <div key={job.id} className="sankey-job-card" onClick={() => onEditJob(job)}>
-                                          <div className="job-role">{job.role}</div>
-                                          <div className="job-company">{job.company}</div>
-                                          {job.gapAnalysis?.matchScore && (
-                                            <div className="job-score" style={{
-                                              color: job.gapAnalysis.matchScore >= 70 ? '#10b981' : '#f59e0b'
-                                            }}>
-                                              {job.gapAnalysis.matchScore}%
+                                      <span className="node-dot" style={{ background: col.color }} />
+                                      <span className="node-label">{col.label}</span>
+                                      <span className="node-count-badge">{statusJobs.length}</span>
+                                    </button>
+
+                                    {/* 5. Job Cards */}
+                                    {isStatusExpanded && (
+                                      <div
+                                        className="sankey-jobs-list"
+                                        ref={el => jobListRefs.current[statusKey] = el}
+                                      >
+                                        {statusJobs.map(job => {
+                                          const score = job.gapAnalysis?.matchScore
+                                          const scoreColor = score >= 70 ? '#10b981' : score >= 50 ? '#f59e0b' : '#A9070E'
+                                          return (
+                                            <div key={job.id} className="sankey-job-card" onClick={() => onEditJob(job)}>
+                                              <div className="job-header">
+                                                <div className="job-role">{job.role}</div>
+                                                {score && (
+                                                  <span className="job-score" style={{ color: scoreColor }}>
+                                                    {score}%
+                                                  </span>
+                                                )}
+                                              </div>
+                                              <div className="job-company">{job.company}</div>
                                             </div>
-                                          )}
-                                        </div>
-                                      ))}
-                                    </div>
-                                  )}
-                                </div>
-                              )
-                            })}
-                          </div>
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
-            </div>
-          )
-        })}
-      </div>
+                                          )
+                                        })}
+                                      </div>
+                                    )}
+                                  </div>
+                                )
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
       </div>
     </div>
   )

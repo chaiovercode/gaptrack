@@ -20,15 +20,15 @@ function Layout({
   onLogoClick,
   onExitDemo
 }) {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true)
   const [sidebarOpen, setSidebarOpen] = useState(false) // For mobile
 
   // Navigation items
   const navItems = [
-    { id: 'jobs', label: 'Jobs', icon: 'jobs', badge: applicationCount },
-    { id: 'profile', label: 'Resume', icon: 'resume', status: resumeExists ? 'done' : 'pending' },
-    { id: 'contacts', label: 'Contacts', icon: 'contacts' },
-    { id: 'settings', label: 'Settings', icon: 'settings' }
+    { id: 'jobs', label: 'targets', icon: 'jobs', badge: applicationCount },
+    { id: 'profile', label: 'dossier', icon: 'resume', status: resumeExists ? 'done' : 'pending' },
+    { id: 'contacts', label: 'contacts', icon: 'contacts' },
+    { id: 'settings', label: 'settings', icon: 'settings' }
   ]
 
   const handleNavigate = (view) => {
@@ -61,45 +61,16 @@ function Layout({
               }}
               title="Go to homepage"
             >
-              <img src="/gaptrack/logo.png" alt="GapTrack" className="navbar-logo-img" />
-              <span className="navbar-logo-text">GapTrack</span>
+              <span className="navbar-logo-text">&gt; gaptrack_</span>
             </a>
           </div>
 
           <div className="top-navbar-center">
-            {/* View Mode Toggle - only show on Jobs view */}
-            {currentView === 'jobs' && onViewModeChange && (
-              <div className="view-toggle">
-                <button
-                  className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
-                  onClick={() => onViewModeChange('list')}
-                  title="List view"
-                >
-                  <span className="view-icon view-icon-list" />
-                  <span className="view-label">List</span>
-                </button>
-                <button
-                  className={`view-toggle-btn ${viewMode === 'kanban' ? 'active' : ''}`}
-                  onClick={() => onViewModeChange('kanban')}
-                  title="Kanban view"
-                >
-                  <span className="view-icon view-icon-kanban" />
-                  <span className="view-label">Kanban</span>
-                </button>
-                <button
-                  className={`view-toggle-btn ${viewMode === 'funnel' ? 'active' : ''}`}
-                  onClick={() => onViewModeChange('funnel')}
-                  title="Funnel view"
-                >
-                  <span className="view-icon view-icon-funnel" />
-                  <span className="view-label">Funnel</span>
-                </button>
-              </div>
-            )}
+            {/* View Mode Toggle moved to JobsView */}
           </div>
 
           <div className="top-navbar-right">
-            {/* Spacer to balance the layout */}
+            {/* Shutdown button removed */}
           </div>
         </div>
       </header>
@@ -108,10 +79,10 @@ function Layout({
       {isDemo && (
         <div className="demo-banner">
           <span className="demo-banner-text">
-            Demo Mode - Viewing sample data for Janardan Jakhar
+            simulation_mode: decrypted_profile [elliot_alderson]
           </span>
           <button className="demo-banner-btn" onClick={onExitDemo}>
-            Exit Demo
+            terminate_process
           </button>
         </div>
       )}
@@ -178,14 +149,14 @@ function Layout({
         {/* Footer */}
         <footer className="footer">
           <p className="footer-text">
-            Built with privacy in mind.{' '}
+            your data stays local. where it belongs.{' '}
             <a
               href="https://github.com/chaiovercode/gaptrack"
               className="footer-link"
               target="_blank"
               rel="noopener noreferrer"
             >
-              View on GitHub
+              github
             </a>
           </p>
         </footer>

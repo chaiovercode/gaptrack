@@ -8,6 +8,7 @@
  */
 import { useState, useEffect } from 'react'
 import { Button, Card, Container, Modal, Layout } from './shared/components'
+import { removeDirectoryHandle } from './services/storage/indexedDB'
 import { useStorage, useAI } from './shared/hooks'
 import { AISettings } from './features/settings/components'
 import { ResumeUpload } from './features/resume/components'
@@ -24,6 +25,7 @@ function App() {
     isLoading,
     error,
     needsSetup,
+    needsReconnect,
     setupFileStorage,
     openExistingFile,
     save,
@@ -41,7 +43,8 @@ function App() {
     analyzeGap,
     analyzeResume,
     isProcessing: aiProcessing,
-    error: aiError
+    error: aiError,
+    cancel
   } = useAI(data?.settings)
 
   // Resume analysis state
@@ -60,11 +63,29 @@ function App() {
     }
   }, [data])
 
-  // Handle demo mode - load mock data and go to jobs
+  // Handle demo mode - disconnects file storage and reloads in safe mode
   const handleDemo = async () => {
-    await save({ ...MOCK_DATA, isDemo: true })
-    setCurrentView('jobs')
+    try {
+      // Critical: Remove file system handle to prevent overwriting user data
+      await removeDirectoryHandle()
+      localStorage.clear()
+      localStorage.setItem('gaptrack-launch-demo', 'true')
+      window.location.reload()
+    } catch (e) {
+      console.error('Failed to enter simulation mode:', e)
+      alert('Could not disconnect storage. Aborting demo to protect your data.')
+    }
   }
+
+  // Check for demo launch flag on init
+  useEffect(() => {
+    if (!isLoading && localStorage.getItem('gaptrack-launch-demo')) {
+      localStorage.removeItem('gaptrack-launch-demo')
+      save({ ...MOCK_DATA, isDemo: true })
+      setHasStartedSetup(true)
+      setCurrentView('jobs')
+    }
+  }, [isLoading, save])
 
   // Check if in demo mode
   const isDemo = data?.isDemo === true
@@ -75,10 +96,10 @@ function App() {
     window.location.reload()
   }
 
-  // Logo click - go to jobs view and clean URL
+  // Logo click - go to landing page (homepage) without losing data
   const handleLogoClick = () => {
-    window.history.pushState(null, '', window.location.pathname + window.location.search)
-    setCurrentView('jobs')
+    setHasStartedSetup(false)
+    window.history.pushState(null, '', window.location.pathname)
   }
 
   // Valid views for URL routing
@@ -169,9 +190,10 @@ function App() {
    * Handle adding application with auto gap analysis
    */
   const handleAddApplication = async (appData) => {
-    // Auto-run gap analysis if we have a resume and parsed JD
-    let gapAnalysis = null
-    if (data?.resume && appData.parsedJD) {
+    // Auto-run gap analysis if we have a resume and parsed JD, and it wasn't already done
+    let gapAnalysis = appData.gapAnalysis
+
+    if (!gapAnalysis && data?.resume && appData.parsedJD) {
       const result = await analyzeGap(data.resume, appData.parsedJD)
       if (result.success) {
         gapAnalysis = result.data
@@ -284,6 +306,25 @@ function App() {
     }
   }
 
+  // Handle start from landing page
+  const handleStart = async () => {
+    // If coming from demo mode or has leftover demo data, clear it
+    if (isDemo || data?.resume?.name === 'Elliot Alderson') {
+      try {
+        await save(null)
+        localStorage.clear()
+      } catch (e) {
+        console.error('Error clearing data:', e)
+      }
+      setHasConfiguredStorage(false)
+    }
+
+    // Tiny delay to ensure storage clearing propagates before rendering main app
+    setTimeout(() => {
+      setHasStartedSetup(true)
+    }, 50)
+  }
+
   // === LOADING STATE ===
   if (isLoading) {
     return (
@@ -298,8 +339,8 @@ function App() {
   }
 
   // === LANDING PAGE (Homepage) ===
-  if (needsSetup && !hasStartedSetup) {
-    return <LandingPage onGetStarted={() => setHasStartedSetup(true)} onDemo={handleDemo} />
+  if (!hasStartedSetup) {
+    return <LandingPage onGetStarted={handleStart} onDemo={handleDemo} />
   }
 
   // === STORAGE SETUP SCREEN ===
@@ -308,9 +349,9 @@ function App() {
       <SetupLayout onBack={() => setHasStartedSetup(false)}>
         <Container size="sm">
           <Card padding="lg">
-            <h2 className="text-2xl font-bold mb-4">Choose Where to Save</h2>
+            <h2 className="text-2xl font-bold mb-4">mount_storage</h2>
             <p className="text-light mb-6">
-              Your data stays on your computer. Pick a folder to store it:
+              data persists locally. no cloud leaks. select persistence layer:
             </p>
 
             {error && (
@@ -322,24 +363,24 @@ function App() {
             {isFileSystemSupported ? (
               <div className="flex flex-col gap-4">
                 <Button variant="primary" size="lg" className="w-full" onClick={setupFileStorage}>
-                  Create New GapTrack Folder
+                  initialize_new_directory
                 </Button>
                 <Button variant="secondary" size="lg" className="w-full" onClick={openExistingFile}>
-                  Open Existing Folder
+                  mount_existing_volume
                 </Button>
                 <p className="text-sm text-light text-center mt-4">
-                  Your data is saved locally in your browser.
+                  filesystem access granted.
                   <br />
-                  Optionally sync to a folder for backup.
+                  data redundancy: user_managed.
                 </p>
               </div>
             ) : (
               <div className="flex flex-col gap-4">
                 <p className="text-sm text-light">
-                  Your data will be saved in your browser's local storage.
+                  filesystem_access: denied. defaulting to browser_cache.
                 </p>
                 <Button variant="primary" size="lg" className="w-full" onClick={setupFileStorage}>
-                  Get Started
+                  confirm_local_storage
                 </Button>
               </div>
             )}
@@ -379,12 +420,23 @@ function App() {
       onLogoClick={handleLogoClick}
       onExitDemo={handleResetApp}
     >
+      {/* Reconnect Banner - shown when folder access was lost */}
+      {needsReconnect && (
+        <div className="reconnect-banner">
+          <span>Folder connection lost. Your data is cached locally.</span>
+          <Button variant="primary" size="sm" onClick={openExistingFile}>
+            Reconnect to Folder
+          </Button>
+        </div>
+      )}
+
       {/* Jobs View */}
       {currentView === 'jobs' && (
         <JobsView
           jobs={data?.applications || []}
           contacts={data?.contacts || []}
           viewMode={viewMode}
+          onViewModeChange={setViewMode}
           goalDate={data?.settings?.goalDate}
           onUpdateGoalDate={async (date) => {
             await updateAndSave('settings', { ...data?.settings, goalDate: date })
@@ -422,6 +474,9 @@ function App() {
         <ProfileView
           resume={data?.resume}
           onUpdateResume={() => setShowResumeUpload(true)}
+          onSaveResume={async (updatedResume) => {
+            await updateAndSave('resume', updatedResume)
+          }}
           onAnalyzeResume={handleAnalyzeResume}
           isAnalyzing={aiProcessing}
           analysisResult={resumeAnalysis}
@@ -444,7 +499,10 @@ function App() {
       {/* Resume Upload Modal */}
       <Modal
         isOpen={showResumeUpload}
-        onClose={() => setShowResumeUpload(false)}
+        onClose={() => {
+          cancel()
+          setShowResumeUpload(false)
+        }}
         title={data?.resume ? "Update Resume" : "Upload Resume"}
         size="lg"
       >
@@ -479,10 +537,11 @@ function App() {
       <Modal
         isOpen={showAddAppModal}
         onClose={() => {
+          cancel()
           setShowAddAppModal(false)
           setEditingJob(null)
         }}
-        title={editingJob ? 'Edit Application' : 'Add Application'}
+        title={editingJob ? 'edit target' : 'add target'}
         size="lg"
       >
         <AddApplication
@@ -494,6 +553,11 @@ function App() {
           analyzeGap={analyzeGap}
           isProcessing={aiProcessing}
           error={aiError}
+          onCancel={() => {
+            cancel()
+            setShowAddAppModal(false)
+            setEditingJob(null)
+          }}
         />
       </Modal>
 
