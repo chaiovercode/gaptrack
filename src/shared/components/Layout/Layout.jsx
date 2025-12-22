@@ -15,7 +15,10 @@ function Layout({
   resumeExists,
   applicationCount,
   viewMode = 'list',
-  onViewModeChange
+  onViewModeChange,
+  isDemo = false,
+  onLogoClick,
+  onExitDemo
 }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false) // For mobile
@@ -34,7 +37,7 @@ function Layout({
   }
 
   return (
-    <div className={`app-layout ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+    <div className={`app-layout ${sidebarCollapsed ? 'sidebar-collapsed' : ''} ${isDemo ? 'demo-mode' : ''}`}>
       {/* Top Navbar - Full Width */}
       <header className="top-navbar">
         <div className="top-navbar-inner">
@@ -46,7 +49,17 @@ function Layout({
             >
               <span className="menu-icon" />
             </button>
-            <a href="#" className="top-navbar-logo" onClick={() => handleNavigate('jobs')}>
+            <a
+              href="#"
+              className="top-navbar-logo"
+              onClick={(e) => {
+                e.preventDefault();
+                if (onLogoClick) {
+                  onLogoClick();
+                }
+              }}
+              title="Go to homepage"
+            >
               <img src="/gaptrack/logo.png" alt="GapTrack" className="navbar-logo-img" />
               <span className="navbar-logo-text">GapTrack</span>
             </a>
@@ -90,6 +103,18 @@ function Layout({
         </div>
       </header>
 
+      {/* Demo Mode Banner */}
+      {isDemo && (
+        <div className="demo-banner">
+          <span className="demo-banner-text">
+            Demo Mode - Viewing sample data for Janardan Jakhar
+          </span>
+          <button className="demo-banner-btn" onClick={onExitDemo}>
+            Exit Demo
+          </button>
+        </div>
+      )}
+
       {/* Mobile overlay */}
       <div
         className={`sidebar-overlay ${sidebarOpen ? 'visible' : ''}`}
@@ -117,7 +142,14 @@ function Layout({
                 onClick={() => handleNavigate(item.id)}
                 title={sidebarCollapsed ? item.label : undefined}
               >
-                <span className={`nav-icon nav-icon-${item.icon}`} />
+                {item.icon === 'settings' ? (
+                  <svg className="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="3" />
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                  </svg>
+                ) : (
+                  <span className={`nav-icon nav-icon-${item.icon}`} />
+                )}
                 {!sidebarCollapsed && (
                   <>
                     <span className="nav-item-label">{item.label}</span>

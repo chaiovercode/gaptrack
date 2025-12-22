@@ -26,7 +26,7 @@ import {
  * @param {Object} settings - { aiProvider: 'gemini'|'openai'|'ollama', geminiApiKey, openaiApiKey, ollamaModel }
  */
 export function createAIService(settings) {
-  const { aiProvider, geminiApiKey, openaiApiKey, ollamaModel = 'llava' } = settings
+  const { aiProvider, geminiApiKey, openaiApiKey, ollamaModel = 'mistral' } = settings
 
   /**
    * Call the AI with a prompt (internal use)
@@ -50,24 +50,45 @@ export function createAIService(settings) {
   }
 
   /**
-   * Parse JSON from AI response (handles markdown code blocks)
+   * Parse JSON from AI response (handles various formats)
    */
   function parseJSON(text) {
+    if (!text) return null
+
+    let cleaned = text.trim()
+
+    // Try direct parse first
     try {
-      // Remove markdown code blocks if present
-      let cleaned = text.trim()
-      if (cleaned.startsWith('```json')) {
-        cleaned = cleaned.slice(7)
-      } else if (cleaned.startsWith('```')) {
-        cleaned = cleaned.slice(3)
-      }
-      if (cleaned.endsWith('```')) {
-        cleaned = cleaned.slice(0, -3)
-      }
-      return JSON.parse(cleaned.trim())
-    } catch (error) {
-      return null
+      return JSON.parse(cleaned)
+    } catch (e) {
+      // Continue to other methods
     }
+
+    // Remove markdown code blocks (various formats)
+    cleaned = cleaned
+      .replace(/^```json\s*/i, '')
+      .replace(/^```\s*/i, '')
+      .replace(/\s*```$/i, '')
+      .trim()
+
+    try {
+      return JSON.parse(cleaned)
+    } catch (e) {
+      // Continue to extraction method
+    }
+
+    // Try to extract JSON object from text
+    const jsonMatch = text.match(/\{[\s\S]*\}/)
+    if (jsonMatch) {
+      try {
+        return JSON.parse(jsonMatch[0])
+      } catch (e) {
+        console.error('Failed to parse extracted JSON:', jsonMatch[0].substring(0, 200))
+      }
+    }
+
+    console.error('Could not parse AI response as JSON:', text.substring(0, 500))
+    return null
   }
 
   return {
@@ -175,7 +196,7 @@ export function createAIService(settings) {
  * Test if the AI provider is configured correctly
  */
 export async function testAIProvider(settings) {
-  const { aiProvider, geminiApiKey, openaiApiKey, ollamaModel = 'llava' } = settings
+  const { aiProvider, geminiApiKey, openaiApiKey, ollamaModel = 'mistral' } = settings
 
   if (aiProvider === 'gemini') {
     if (!geminiApiKey) {

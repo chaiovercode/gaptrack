@@ -10,9 +10,12 @@
  * 3. Run: ollama serve (runs on http://localhost:11434)
  *
  * RECOMMENDED MODELS:
- * - mistral (7B) - Good balance of speed and quality
- * - llama2 (7B) - Meta's model, good general purpose
- * - codellama (7B) - Better for technical content
+ * - mistral (7B) - Best for instruction following & JSON output (Recommended)
+ * - llama3.2 - Good lightweight alternative
+ * - phi3 - Microsoft's small model
+ * - qwen2.5 - Good for structured output
+ *
+ * NOTE: nuextract requires special template format, not recommended for this app
  */
 
 const OLLAMA_API_URL = 'http://localhost:11434/api/generate'
@@ -26,6 +29,7 @@ const OLLAMA_API_URL = 'http://localhost:11434/api/generate'
  */
 export async function callOllama(model, prompt) {
   try {
+    // Use lower temperature for more consistent JSON output
     const response = await fetch(OLLAMA_API_URL, {
       method: 'POST',
       headers: {
@@ -34,10 +38,10 @@ export async function callOllama(model, prompt) {
       body: JSON.stringify({
         model: model,
         prompt: prompt,
-        stream: false,  // Get full response at once (not streamed)
+        stream: false,
         options: {
-          temperature: 0.7,
-          num_predict: 4096,  // Max tokens to generate
+          temperature: 0.3,  // Lower temp for consistent JSON
+          num_predict: 4096,
         }
       })
     })

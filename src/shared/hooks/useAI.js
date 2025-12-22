@@ -125,7 +125,7 @@ export function useAI(settings) {
    * Check Ollama status (is it running? which models?)
    */
   const checkOllama = useCallback(async (model) => {
-    return checkOllamaStatus(model || settings?.ollamaModel || 'llava')
+    return checkOllamaStatus(model || settings?.ollamaModel || 'mistral')
   }, [settings?.ollamaModel])
 
   return {

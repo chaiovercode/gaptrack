@@ -42,11 +42,14 @@ function ProfileView({
   const education = Array.isArray(resume?.education) ? resume.education : []
   const certifications = Array.isArray(resume?.certifications) ? resume.certifications : []
 
+  // Check if we have actual resume data (not just empty storage object)
+  const hasResumeData = resume?.name || skills.length > 0 || experience.length > 0
+
   return (
     <div className="profile-view">
       <h2 className="page-title">Resume</h2>
       {/* Empty State when no resume */}
-      {!resume && (
+      {!hasResumeData && (
         <section className="profile-section">
           <Card padding="lg" className="resume-empty">
             <div className="empty-icon">+</div>
@@ -60,7 +63,7 @@ function ProfileView({
       )}
 
       {/* Resume Analysis Section - At Top */}
-      {resume && (
+      {hasResumeData && (
         <section className="profile-section analysis-section">
           <div className="section-header">
             <h2>Resume Analysis</h2>
@@ -172,7 +175,7 @@ function ProfileView({
       )}
 
       {/* Resume Details Section - Collapsed by Default */}
-      {resume && (
+      {hasResumeData && (
         <section className="profile-section resume-details-section">
           <div className="section-header">
             <h2>Resume Details</h2>
@@ -186,7 +189,9 @@ function ProfileView({
                 {skills.length > 0 && (
                   <div className={`resume-block skills-block ${expanded.skills ? 'expanded' : 'collapsed'}`}>
                     <button className="block-header" onClick={() => toggleSection('skills')}>
-                      <span className="block-icon icon-skills" />
+                      <svg className="block-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                      </svg>
                       <h3>Skills</h3>
                       <span className="block-count">{skills.length}</span>
                       <span className="block-toggle" />
@@ -214,7 +219,10 @@ function ProfileView({
                 {experience.length > 0 && (
                   <div className={`resume-block ${expanded.experience ? 'expanded' : 'collapsed'}`}>
                     <button className="block-header" onClick={() => toggleSection('experience')}>
-                      <span className="block-icon icon-briefcase" />
+                      <svg className="block-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+                      </svg>
                       <h3>Experience</h3>
                       <span className="block-count">{experience.length}</span>
                       <span className="block-toggle" />
@@ -256,7 +264,10 @@ function ProfileView({
                 {education.length > 0 && (
                   <div className={`resume-block ${expanded.education ? 'expanded' : 'collapsed'}`}>
                     <button className="block-header" onClick={() => toggleSection('education')}>
-                      <span className="block-icon icon-education" />
+                      <svg className="block-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                        <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                      </svg>
                       <h3>Education</h3>
                       <span className="block-count">{education.length}</span>
                       <span className="block-toggle" />
@@ -281,7 +292,10 @@ function ProfileView({
                 {certifications.length > 0 && (
                   <div className={`resume-block ${expanded.certifications ? 'expanded' : 'collapsed'}`}>
                     <button className="block-header" onClick={() => toggleSection('certifications')}>
-                      <span className="block-icon icon-cert" />
+                      <svg className="block-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="8" r="6" />
+                        <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
+                      </svg>
                       <h3>Certifications</h3>
                       <span className="block-count">{certifications.length}</span>
                       <span className="block-toggle" />

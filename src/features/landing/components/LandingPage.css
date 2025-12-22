@@ -157,6 +157,29 @@
   box-shadow: var(--shadow-xs);
 }
 
+.landing-btn-demo {
+  padding: var(--space-4) var(--space-8);
+  background: var(--color-bg-elevated);
+  color: var(--color-primary);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  border: 3px solid var(--color-primary);
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.landing-btn-demo:hover {
+  background: var(--color-primary-light);
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--color-primary);
+}
+
+.landing-btn-demo:active {
+  transform: translate(0, 0);
+  box-shadow: var(--shadow-xs);
+}
+
 /* Hero Mockup */
 .landing-hero-visual {
   display: flex;
@@ -542,6 +565,7 @@
   }
 
   .landing-btn-primary,
+  .landing-btn-demo,
   .landing-btn-secondary {
     width: 100%;
   }

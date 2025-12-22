@@ -5,7 +5,7 @@
  */
 import './LandingPage.css'
 
-function LandingPage({ onGetStarted }) {
+function LandingPage({ onGetStarted, onDemo }) {
   const scrollToFeatures = () => {
     document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })
   }
@@ -40,6 +40,9 @@ function LandingPage({ onGetStarted }) {
           <div className="landing-hero-actions">
             <button className="landing-btn-primary" onClick={onGetStarted}>
               Get Started Free
+            </button>
+            <button className="landing-btn-demo" onClick={onDemo}>
+              Try Demo
             </button>
             <button className="landing-btn-secondary" onClick={scrollToFeatures}>
               Learn More

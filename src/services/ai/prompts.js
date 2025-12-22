@@ -178,9 +178,22 @@ export function getResumeAnalysisPrompt(parsedResume, mode = 'normal') {
   const isRoast = mode === 'roast'
 
   const tone = isRoast
-    ? `You are a brutally honest resume critic. Be harsh, sarcastic, and pull no punches.
-       Channel Gordon Ramsay reviewing a resume. Point out every flaw mercilessly.
-       Be funny but still provide actual useful feedback underneath the roasting.`
+    ? `You are a SAVAGE comedy roast comedian reviewing a resume. Channel the energy of:
+       - Gordon Ramsay screaming at a chef
+       - A Comedy Central roast
+       - Simon Cowell at his most brutal
+       - Your disappointed Asian parents
+
+       Be RUTHLESSLY FUNNY. Use creative insults, metaphors, and brutal honesty.
+       Mock their buzzwords, question their life choices, roast their "achievements".
+       Make them laugh while they cry. Be absolutely MERCILESS but never mean-spirited.
+
+       Examples of roast energy:
+       - "Your skills section looks like you just Googled 'things to put on resume'"
+       - "This resume has more fluff than a Build-A-Bear workshop"
+       - "I've seen more impact from a participation trophy"
+
+       Still provide actually useful feedback hidden in the burns.`
     : `You are a supportive career coach providing constructive feedback.
        Be encouraging but honest. Focus on actionable improvements.`
 
@@ -192,24 +205,36 @@ ${JSON.stringify(parsedResume, null, 2)}
 Analyze this resume and return ONLY valid JSON (no markdown, no explanation):
 {
   "score": <your score 0-100>,
-  "summary": "<your ${isRoast ? 'savage roast' : 'assessment'}>",
-  "strengths": ["<strength 1>", "<strength 2>"],
-  "improvements": ["<improvement 1>", "<improvement 2>", "<improvement 3>"],
-  "tips": ["<tip 1>", "<tip 2>"]
+  "summary": "<${isRoast ? '2-3 sentences of BRUTAL roasting that makes them question their career choices' : 'your assessment'}>",
+  "strengths": ["<${isRoast ? 'backhanded compliment 1' : 'strength 1'}>", "<${isRoast ? 'backhanded compliment 2' : 'strength 2'}>"],
+  "improvements": ["<${isRoast ? 'savage burn with actual advice 1' : 'improvement 1'}>", "<${isRoast ? 'savage burn with actual advice 2' : 'improvement 2'}>", "<${isRoast ? 'savage burn with actual advice 3' : 'improvement 3'}>"],
+  "tips": ["<${isRoast ? 'brutal but useful tip 1' : 'tip 1'}>", "<${isRoast ? 'brutal but useful tip 2' : 'tip 2'}>"]
 }
 
-SCORING CRITERIA (be accurate, don't default to any number):
-- 90-100: Exceptional resume, ready for top companies
-- 75-89: Strong resume with minor improvements needed
-- 60-74: Good foundation but needs work
-- 40-59: Significant improvements required
-- 0-39: Major overhaul needed
+SCORING CRITERIA (use this EXACT rubric - add up points):
+Base score: 50 points, then add/subtract:
+- Contact info complete (name, email, phone, location): +5
+- Has professional summary: +5
+- Has 3+ work experiences with details: +10
+- Has quantified achievements (numbers, metrics, %): +10
+- Has relevant skills listed: +5
+- Has education listed: +5
+- Strong action verbs used: +5
+- No obvious gaps or red flags: +5
+- Subtract 5 points for each: buzzword fluff, vague descriptions, missing sections
+
+Final ranges:
+- 85-100: Exceptional
+- 70-84: Strong
+- 55-69: Needs work
+- 40-54: Significant issues
+- 0-39: Major overhaul
 
 Rules:
 - IMPORTANT: Actually evaluate and score the resume based on content quality, formatting, impact statements, and completeness
-- ${isRoast ? 'Be savage but still helpful' : 'Be supportive but honest'}
-- strengths: 2-4 specific items from their resume
-- improvements: 3-5 items (most important first)
-- tips: 2-3 specific, actionable pieces of advice
+- ${isRoast ? 'Be HILARIOUS and SAVAGE. Make every line quotable. Roast them to a crisp but leave them with real advice buried in the burns.' : 'Be supportive but honest'}
+- strengths: 2-4 items ${isRoast ? '(make them backhanded compliments like "At least you spelled your name right")' : 'from their resume'}
+- improvements: 3-5 items ${isRoast ? '(roast the flaws HARD but include actual fixes)' : '(most important first)'}
+- tips: 2-3 ${isRoast ? 'brutal but genuinely useful pieces of advice' : 'specific, actionable pieces of advice'}
 - Return ONLY valid JSON, nothing else`
 }

@@ -6,7 +6,7 @@
  * 2. AI setup (choose Gemini or Ollama)
  * 3. Main app with simplified navigation (Jobs, Profile, Settings)
  */
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button, Card, Container, Modal, Layout } from './shared/components'
 import { useStorage, useAI } from './shared/hooks'
 import { AISettings } from './features/settings/components'
@@ -16,6 +16,7 @@ import { ContactForm, ContactsView } from './features/contacts/components'
 import { JobsView } from './features/jobs/components'
 import { ProfileView } from './features/profile/components'
 import { LandingPage, SetupLayout } from './features/landing'
+import { MOCK_DATA, MOCK_ANALYSIS } from './data/mockData'
 
 function App() {
   const {
@@ -25,6 +26,7 @@ function App() {
     needsSetup,
     setupFileStorage,
     openExistingFile,
+    save,
     updateAndSave,
     addApplication,
     deleteContact,
@@ -48,8 +50,63 @@ function App() {
   // Track if user has started setup from landing page
   const [hasStartedSetup, setHasStartedSetup] = useState(false)
 
-  // Current view (jobs or profile)
-  const [currentView, setCurrentView] = useState('jobs')
+  // Track if storage has been configured (folder selected or localStorage initialized)
+  const [hasConfiguredStorage, setHasConfiguredStorage] = useState(!!data)
+
+  // Update hasConfiguredStorage when data becomes available
+  useEffect(() => {
+    if (data) {
+      setHasConfiguredStorage(true)
+    }
+  }, [data])
+
+  // Handle demo mode - load mock data and go to jobs
+  const handleDemo = async () => {
+    await save({ ...MOCK_DATA, isDemo: true })
+    setCurrentView('jobs')
+  }
+
+  // Check if in demo mode
+  const isDemo = data?.isDemo === true
+
+  // Reset app (clears data and shows landing page)
+  const handleResetApp = () => {
+    localStorage.clear()
+    window.location.reload()
+  }
+
+  // Logo click - just go to jobs view (don't clear data)
+  const handleLogoClick = () => {
+    setCurrentView('jobs')
+  }
+
+  // Valid views for URL routing
+  const validViews = ['jobs', 'contacts', 'profile', 'settings']
+
+  // Get view from URL hash
+  const getViewFromHash = () => {
+    const hash = window.location.hash.slice(1) // Remove #
+    return validViews.includes(hash) ? hash : 'jobs'
+  }
+
+  // Current view (jobs, contacts, profile, settings)
+  const [currentView, setCurrentView] = useState(getViewFromHash)
+
+  // Sync URL hash with view changes
+  useEffect(() => {
+    if (window.location.hash !== `#${currentView}`) {
+      window.location.hash = currentView
+    }
+  }, [currentView])
+
+  // Handle hash changes (back/forward + direct hash changes)
+  useEffect(() => {
+    const handleHashChange = () => {
+      setCurrentView(getViewFromHash())
+    }
+    window.addEventListener('hashchange', handleHashChange)
+    return () => window.removeEventListener('hashchange', handleHashChange)
+  }, [])
 
   // View mode for jobs (list or kanban)
   const [viewMode, setViewMode] = useState('list')
@@ -196,6 +253,14 @@ function App() {
   const handleAnalyzeResume = async (mode) => {
     if (!data?.resume) return
 
+    // In demo mode, use mock analysis results
+    if (isDemo) {
+      // Simulate a brief delay for realism
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      setResumeAnalysis(MOCK_ANALYSIS[mode] || MOCK_ANALYSIS.normal)
+      return
+    }
+
     const result = await analyzeResume(data.resume, mode)
     if (result.success) {
       setResumeAnalysis(result.data)
@@ -217,13 +282,13 @@ function App() {
     )
   }
 
-  // === LANDING PAGE (Marketing) ===
+  // === LANDING PAGE (Homepage) ===
   if (needsSetup && !hasStartedSetup) {
-    return <LandingPage onGetStarted={() => setHasStartedSetup(true)} />
+    return <LandingPage onGetStarted={() => setHasStartedSetup(true)} onDemo={handleDemo} />
   }
 
   // === STORAGE SETUP SCREEN ===
-  if (needsSetup) {
+  if (needsSetup && !hasConfiguredStorage) {
     return (
       <SetupLayout onBack={() => setHasStartedSetup(false)}>
         <Container size="sm">
@@ -248,16 +313,15 @@ function App() {
                   Open Existing Folder
                 </Button>
                 <p className="text-sm text-light text-center mt-4">
-                  Your data is saved in separate JSON files (jobs, contacts, resume, settings).
+                  Your data is saved locally in your browser.
                   <br />
-                  Put the folder in Google Drive, iCloud or Dropbox to sync across devices.
+                  Optionally sync to a folder for backup.
                 </p>
               </div>
             ) : (
               <div className="flex flex-col gap-4">
                 <p className="text-sm text-light">
-                  Your browser doesn't support the File System API.
-                  Data will be saved in your browser's local storage.
+                  Your data will be saved in your browser's local storage.
                 </p>
                 <Button variant="primary" size="lg" className="w-full" onClick={setupFileStorage}>
                   Get Started
@@ -296,6 +360,9 @@ function App() {
       applicationCount={data?.applications?.length || 0}
       viewMode={viewMode}
       onViewModeChange={setViewMode}
+      isDemo={isDemo}
+      onLogoClick={handleLogoClick}
+      onExitDemo={handleResetApp}
     >
       {/* Jobs View */}
       {currentView === 'jobs' && (
@@ -303,6 +370,10 @@ function App() {
           jobs={data?.applications || []}
           contacts={data?.contacts || []}
           viewMode={viewMode}
+          goalDate={data?.settings?.goalDate}
+          onUpdateGoalDate={async (date) => {
+            await updateAndSave('settings', { ...data?.settings, goalDate: date })
+          }}
           onAddJob={() => {
             setEditingJob(null)
             setShowAddAppModal(true)
@@ -350,6 +421,7 @@ function App() {
             onSave={async (aiSettings) => {
               await updateAndSave('settings', aiSettings)
             }}
+            onResetApp={handleResetApp}
           />
         </div>
       )}
@@ -358,7 +430,7 @@ function App() {
       <Modal
         isOpen={showResumeUpload}
         onClose={() => setShowResumeUpload(false)}
-        title="Upload Resume"
+        title={data?.resume ? "Update Resume" : "Upload Resume"}
         size="lg"
       >
         <ResumeUpload

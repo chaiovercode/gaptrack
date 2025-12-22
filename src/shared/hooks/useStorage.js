@@ -27,6 +27,7 @@ export function useStorage() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
   const [storageType, setStorageType] = useState(null)
+  const [needsReconnect, setNeedsReconnect] = useState(false)
 
   // Use refs to avoid stale closures
   const dataRef = useRef(data)
@@ -53,19 +54,10 @@ export function useStorage() {
   const initializeStorage = async () => {
     setIsLoading(true)
     setError(null)
+    setStorageType('localStorage')
 
-    if (isFileSystemSupported()) {
-      setStorageType('fileSystem')
-      const hasFolder = localStorage.getItem(HAS_FOLDER_KEY)
-      if (!hasFolder) {
-        setIsLoading(false)
-        return
-      }
-    } else {
-      setStorageType('localStorage')
-      loadFromLocalStorage()
-    }
-
+    // Always use localStorage - simple and reliable
+    loadFromLocalStorage()
     setIsLoading(false)
   }
 
@@ -102,12 +94,15 @@ export function useStorage() {
     // Convert to flat structure for compatibility
     const flatData = convertToFlatData(readResult.data)
     setData(flatData)
+    // Cache in localStorage for offline/reconnect scenarios
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(flatData))
+    setNeedsReconnect(false)
     setIsLoading(false)
     return { success: true }
   }, [])
 
   /**
-   * Open existing folder
+   * Open existing folder (also used for reconnecting)
    */
   const openExistingFile = useCallback(async () => {
     setIsLoading(true)
@@ -135,6 +130,9 @@ export function useStorage() {
 
     const flatData = convertToFlatData(readResult.data)
     setData(flatData)
+    // Cache in localStorage for offline/reconnect scenarios
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(flatData))
+    setNeedsReconnect(false)
     setIsLoading(false)
     return { success: true }
   }, [])
@@ -162,6 +160,9 @@ export function useStorage() {
       updatedAt: new Date().toISOString()
     }
 
+    // Always cache in localStorage
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave))
+
     if (storageType === 'fileSystem' && dirHandle) {
       // Save each file separately
       await saveDataType(dirHandle, 'jobs', {
@@ -174,8 +175,6 @@ export function useStorage() {
       })
       await saveDataType(dirHandle, 'resume', dataToSave.resume || {})
       await saveDataType(dirHandle, 'settings', dataToSave.settings || {})
-    } else {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave))
     }
 
     setData(dataToSave)
@@ -201,7 +200,10 @@ export function useStorage() {
     setData(newData)
     dataRef.current = newData // Also update ref immediately
 
-    // Then persist to storage
+    // Always cache in localStorage
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(newData))
+
+    // Then persist to file system if connected
     if (currentStorageType === 'fileSystem' && currentDirHandle) {
       if (key === 'applications') {
         await saveDataType(currentDirHandle, 'jobs', {
@@ -218,8 +220,6 @@ export function useStorage() {
       } else if (key === 'settings') {
         await saveDataType(currentDirHandle, 'settings', value || {})
       }
-    } else {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(newData))
     }
 
     return { success: true }
@@ -309,21 +309,22 @@ export function useStorage() {
       try {
         setData(JSON.parse(stored))
       } catch {
-        const defaults = getDefaultData()
-        setData(convertToFlatData(defaults))
+        // Invalid JSON, leave data as null to show setup
+        setData(null)
       }
-    } else {
-      const defaults = getDefaultData()
-      setData(convertToFlatData(defaults))
     }
+    // If no stored data, leave data as null to show setup screen
   }
+
+  // Check if user has completed initial setup (has AI provider = completed setup)
+  const hasCompletedSetup = !!data?.settings?.aiProvider
 
   return {
     data,
     isLoading,
     error,
     storageType,
-    needsSetup: storageType === 'fileSystem' && !dirHandle && !data,
+    needsSetup: !hasCompletedSetup,
     setupFileStorage,
     openExistingFile,
     save,
