@@ -75,8 +75,9 @@ function App() {
     window.location.reload()
   }
 
-  // Logo click - just go to jobs view (don't clear data)
+  // Logo click - go to jobs view and clean URL
   const handleLogoClick = () => {
+    window.history.pushState(null, '', window.location.pathname + window.location.search)
     setCurrentView('jobs')
   }
 
@@ -94,7 +95,16 @@ function App() {
 
   // Sync URL hash with view changes
   useEffect(() => {
-    if (window.location.hash !== `#${currentView}`) {
+    // Special handling for jobs view to allow both clean URL and #jobs
+    if (currentView === 'jobs') {
+      const isClean = !window.location.hash || window.location.hash === '#'
+      const isJobsHash = window.location.hash === '#jobs'
+
+      // Only force hash update if it's completely wrong (e.g. #settings when we are on jobs)
+      if (!isClean && !isJobsHash) {
+        window.location.hash = 'jobs'
+      }
+    } else if (window.location.hash !== `#${currentView}`) {
       window.location.hash = currentView
     }
   }, [currentView])
@@ -102,6 +112,11 @@ function App() {
   // Handle hash changes (back/forward + direct hash changes)
   useEffect(() => {
     const handleHashChange = () => {
+      // If we are at root (no hash), go to jobs but keep URL clean
+      if (!window.location.hash) {
+        setCurrentView('jobs')
+        return
+      }
       setCurrentView(getViewFromHash())
     }
     window.addEventListener('hashchange', handleHashChange)

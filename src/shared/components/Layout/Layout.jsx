@@ -32,6 +32,7 @@ function Layout({
   ]
 
   const handleNavigate = (view) => {
+    window.location.hash = view
     onNavigate(view)
     setSidebarOpen(false)
   }
@@ -50,7 +51,7 @@ function Layout({
               <span className="menu-icon" />
             </button>
             <a
-              href="#"
+              href="/gaptrack/"
               className="top-navbar-logo"
               onClick={(e) => {
                 e.preventDefault();
