@@ -167,6 +167,16 @@ export function useAI(settings) {
   )
 
   /**
+   * Chat with AI
+   */
+  const chat = useCallback(
+    withProcessing(async (messageHistory, resumeContext, mode = 'normal', signal) => {
+      return ai.chat(messageHistory, resumeContext, mode, signal)
+    }),
+    [ai, withProcessing]
+  )
+
+  /**
    * Test if AI is configured correctly
    */
   const testConnection = useCallback(async () => {
@@ -209,6 +219,7 @@ export function useAI(settings) {
     analyzeGap,
     generateTailoredSummary,
     analyzeResume,
+    chat,
 
     // Setup/Testing
     testConnection,

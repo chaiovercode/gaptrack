@@ -5,8 +5,9 @@
  * - Jobs: Main view with list/kanban toggle
  * - Profile: Resume + Contacts
  */
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './Layout.css'
+import TerminalChat from '../../../features/chat/TerminalChat'
 
 function Layout({
   children,
@@ -22,6 +23,7 @@ function Layout({
 }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true)
   const [sidebarOpen, setSidebarOpen] = useState(false) // For mobile
+  const [showChat, setShowChat] = useState(false)
 
   // Navigation items
   const navItems = [
@@ -70,10 +72,31 @@ function Layout({
           </div>
 
           <div className="top-navbar-right">
-            {/* Shutdown button removed */}
+            <button
+              className={`navbar-btn ${showChat ? 'active' : ''}`}
+              onClick={() => setShowChat(!showChat)}
+              title="Open Terminal Support (Cmd+K)"
+            >
+              <span className="nav-icon nav-icon-terminal">_&gt;</span>
+            </button>
           </div>
         </div>
       </header>
+
+      {/* Keyboard Shortcut Listener */}
+      {useEffect(() => {
+        const handleKeyDown = (e) => {
+          if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+            e.preventDefault()
+            setShowChat(prev => !prev)
+          }
+        }
+
+        window.addEventListener('keydown', handleKeyDown)
+        return () => window.removeEventListener('keydown', handleKeyDown)
+      }, [])}
+
+      <TerminalChat isOpen={showChat} onClose={() => setShowChat(false)} />
 
       {/* Demo Mode Banner */}
       {isDemo && (

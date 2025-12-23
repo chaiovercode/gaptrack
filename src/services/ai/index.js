@@ -17,7 +17,8 @@ import {
   getJDParsePrompt,
   getGapAnalysisPrompt,
   getTailoredSummaryPrompt,
-  getResumeAnalysisPrompt
+  getResumeAnalysisPrompt,
+  getChatPrompt
 } from './prompts'
 
 /**
@@ -187,6 +188,72 @@ export function createAIService(settings) {
 
       // Add the mode to the result
       return { success: true, data: { ...parsed, mode } }
+    },
+
+    /**
+     * Chat with the AI
+     */
+    async chat(messageHistory, resumeContext, mode = 'normal', signal) {
+      const prompt = getChatPrompt(messageHistory, resumeContext, mode)
+
+      // Debug: Log the jobs being sent
+      const jobCount = resumeContext?.jobs?.length || 0
+      const jobNames = (resumeContext?.jobs || []).map(j => j.company).join(', ')
+      console.log(`--- CHAT: Sending ${jobCount} jobs: [${jobNames}] ---`)
+
+      const result = await call(prompt, signal)
+
+      if (!result.success) {
+        return result
+      }
+
+      let text = result.text.trim()
+      console.log('--- RAW AI RESPONSE ---')
+      console.log(text)
+      console.log('-----------------------')
+
+      // Fallback: If AI returns JSON-like format despite instructions, clean it up
+      if (text.startsWith('{') || text.startsWith('```')) {
+        // Try to parse as JSON first
+        const parsed = parseJSON(text)
+        if (parsed) {
+          // 1. Try standard response keys
+          let content = parsed.response || parsed.message || parsed.assistant || parsed.text || parsed.content || parsed.reply || parsed.answer
+
+          // 2. If not found, look for a LONG string value (avoid short values like company names)
+          if (!content) {
+            const values = Object.values(parsed)
+            const longStrings = values
+              .filter(v => typeof v === 'string' && v.length > 20)
+              .sort((a, b) => b.length - a.length)
+            if (longStrings.length > 0) {
+              content = longStrings[0]
+            }
+          }
+
+          if (content) {
+            text = content
+          }
+        } else {
+          // JSON parsing failed - it might be malformed JSON-like text
+          // Try to extract content after the first colon and strip quotes
+          // e.g., {"Analysis of Lyzr": "### Match Score..." -> ### Match Score...
+          const colonIdx = text.indexOf(':')
+          if (colonIdx > 0 && colonIdx < 50) {
+            let extracted = text.substring(colonIdx + 1).trim()
+            // Remove leading/trailing quotes and braces
+            extracted = extracted.replace(/^["'\s{]+/, '').replace(/["'\s}]+$/, '')
+            if (extracted.length > 20) {
+              text = extracted
+            }
+          }
+        }
+      }
+
+      // Clean up any remaining markdown code block markers
+      text = text.replace(/^```\w*\n?/, '').replace(/\n?```$/, '').trim()
+
+      return { success: true, text }
     },
 
     /**

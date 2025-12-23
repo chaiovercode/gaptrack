@@ -106,7 +106,7 @@ function JobCard({
           )}
         </div>
 
-        {/* Right: Status */}
+        {/* Right: Status + Actions */}
         <div className="job-card-right">
           <div className="status-wrapper" ref={dropdownRef}>
             <button
@@ -120,7 +120,7 @@ function JobCard({
               <span className="status-dot"></span>
               {currentStatus.label}
               <svg className="status-chevron" width="12" height="12" viewBox="0 0 12 12">
-                <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+                <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" fill="none" />
               </svg>
             </button>
 
@@ -142,6 +142,19 @@ function JobCard({
               </div>
             )}
           </div>
+
+          <button
+            className="delete-button"
+            onClick={(e) => {
+              e.stopPropagation()
+              onDelete(job.id)
+            }}
+            title="Delete Target"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+            </svg>
+          </button>
         </div>
       </div>
     </div>

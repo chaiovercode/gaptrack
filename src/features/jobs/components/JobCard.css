@@ -217,6 +217,32 @@
   flex-shrink: 0;
 }
 
+/* Delete Button */
+.delete-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin-left: -4px;
+}
+
+.delete-button:hover {
+  background: var(--color-error-light);
+  color: var(--color-error);
+}
+
+.delete-button:active {
+  transform: translateY(1px);
+}
+
 /* Responsive - Tablet */
 @media (max-width: 768px) {
   .job-card-header {

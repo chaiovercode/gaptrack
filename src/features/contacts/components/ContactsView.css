@@ -404,16 +404,17 @@
   font-weight: var(--font-weight-bold);
   font-family: var(--font-family);
   text-transform: uppercase;
-  background: var(--color-text);
-  border: 2px solid var(--color-text);
+  background: var(--color-primary);
+  border: 2px solid var(--color-primary);
   color: var(--color-text-inverse);
   cursor: pointer;
   transition: all var(--transition-fast);
 }
 
 .add-confirm-btn:hover:not(:disabled) {
-  background: var(--color-primary);
+  background: transparent;
   border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .add-confirm-btn:disabled {

@@ -1,263 +1,333 @@
 /**
- * AI Prompts
+ * AI Prompts - GapTrack
  *
- * These are the instructions we send to the AI.
- * Good prompts = good results. Bad prompts = garbage.
- *
- * PROMPT ENGINEERING TIPS:
- * 1. Be specific about what you want
- * 2. Give examples of the output format
- * 3. Tell the AI what NOT to do
- * 4. Use JSON output for structured data
+ * Mr. Robot themed prompts for resume analysis and job matching.
+ * All prompts return structured JSON unless specified otherwise.
  */
 
 /**
  * Parse a resume and extract structured data.
- * Input: Raw resume text
- * Output: JSON with skills, experience, education, etc.
  */
 export function getResumeParsePrompt(resumeText) {
-  return `You are fsociety's data extraction daemon. Your objective is to scrape structured intelligence from this raw resume dump.
+  return `SYSTEM: Data extraction daemon initialized.
 
-RESUME RAW DATA:
+INPUT:
 ${resumeText}
 
-TASK:
-Extract and normalize data into valid JSON. No markdown. No comments.
+TASK: Extract structured data from this resume into valid JSON.
 
-JSON SCHEMA:
+OUTPUT SCHEMA:
 {
-  "name": "Full Name",
-  "email": "email or null",
-  "phone": "phone or null",
-  "location": "City, Country or null",
-  "summary": "Professional summary text or null",
+  "name": "string | null",
+  "email": "string | null",
+  "phone": "string | null",
+  "location": "string | null",
+  "summary": "string | null",
   "skills": {
-    "technical": ["Hard skill 1", "Hard skill 2"],
-    "tools": ["Tool/Framework 1", "Tool/Framework 2"],
-    "soft": ["Soft skill 1", "Soft skill 2"]
+    "technical": ["string"],
+    "tools": ["string"],
+    "soft": ["string"]
   },
   "experience": [
     {
-      "title": "Job Title",
-      "company": "Company Name",
-      "duration": "Duration text (e.g. 'Jan 2020 - Present')",
-      "highlights": ["Key achievement 1", "Key achievement 2"]
+      "title": "string",
+      "company": "string",
+      "duration": "string",
+      "highlights": ["string (max 20 words each)"]
     }
   ],
   "education": [
     {
-      "degree": "Degree Name",
-      "institution": "University/School",
-      "year": "Graduation Year"
+      "degree": "string",
+      "institution": "string",
+      "year": "string"
     }
   ],
-  "certifications": ["Cert Name 1", "Cert Name 2"],
+  "certifications": ["string"],
   "projects": [
     {
-      "name": "Project Name",
-      "description": "Brief description",
-      "techStack": ["Tech 1", "Tech 2"]
+      "name": "string",
+      "description": "string",
+      "techStack": ["string"]
     }
   ]
 }
 
-PROTOCOL RULES:
-1.  **Strict Extraction**: Only extract what is explicitly written. If a field is missing, return \`null\` or \`[]\`.
-2.  **Normalization**: Standardize skills (e.g., "React.js" -> "React", "AWS Services" -> "AWS").
-3.  **Brevity**: Truncate experience highlights to < 20 words for efficiency.
-4.  **Format**: Return ONLY pure JSON. No preamble.`
+RULES:
+1. STRICT EXTRACTION: Only extract explicitly stated information. Use null or [] for missing fields.
+2. NORMALIZE SKILLS: Standardize variations (e.g., "React.js" → "React", "Amazon Web Services" → "AWS").
+3. DEDUPLICATE: Remove duplicate skills across categories.
+4. BREVITY: Keep highlights under 20 words. Focus on achievements, not responsibilities.
+5. CHRONOLOGICAL: Order experience from most recent to oldest.
+
+OUTPUT: Return ONLY valid JSON. No markdown, no explanation, no preamble.`
 }
 
 /**
  * Parse a job description and extract requirements.
- * Input: Raw job description text
- * Output: JSON with requirements, nice-to-haves, red flags
  */
 export function getJDParsePrompt(jobDescription) {
-  return `You are a corporate firewall analyzer. Deconstruct this Job Description (JD) to identify the target's filtering rules.
+  return `SYSTEM: Job description analysis daemon initialized.
 
-JD RAW DATA:
+INPUT:
 ${jobDescription}
 
-TASK:
-Analyze the target's requirements and return a JSON map of the attack surface.
+TASK: Deconstruct this job posting and extract structured requirements.
 
-JSON SCHEMA:
+OUTPUT SCHEMA:
 {
-  "company": "Company Name",
-  "role": "Role Title",
-  "location": "Location",
-  "salary": "Salary Range or null",
+  "company": "string | null",
+  "role": "string",
+  "location": "string | null",
+  "salary": "string | null",
+  "workType": "remote | hybrid | onsite | null",
   "requirements": {
-    "mustHave": ["Critical skill 1", "Critical skill 2"],
-    "niceToHave": ["Bonus skill 1", "Bonus skill 2"],
-    "experience": "Years of experience text",
-    "education": "Degree requirements or null"
+    "mustHave": ["string - critical/required skills"],
+    "niceToHave": ["string - preferred/bonus skills"],
+    "experience": "string - years required",
+    "education": "string | null"
   },
-  "responsibilities": ["Core duty 1", "Core duty 2"],
-  "redFlags": ["Suspicious phrase 1 (e.g. 'rockstar', 'wear many hats')", "Suspicious phrase 2"],
-  "keywords": ["ATS Keyword 1", "ATS Keyword 2"]
+  "responsibilities": ["string - core duties"],
+  "redFlags": ["string - concerning phrases"],
+  "keywords": ["string - ATS-relevant terms"]
 }
 
-PROTOCOL RULES:
-1.  **Differentiate**: Strictly separate 'Required' vs 'Preferred' skills.
-2.  **Threat Detection**: Identify 'red flags' like "fast-paced environment" (code for burnout) or "competitive salary" (code for low pay).
-3.  **Keywords**: Extract high-value keywords likely used by their ATS algorithm.
-4.  **Format**: Return ONLY pure JSON.`
+RULES:
+1. DIFFERENTIATE REQUIREMENTS: Strictly separate "required" vs "preferred" skills based on language used.
+2. DETECT RED FLAGS: Identify concerning phrases that suggest:
+   - Overwork: "fast-paced", "wear many hats", "startup mentality"
+   - Underpay: "competitive salary", "equity-heavy"
+   - Dysfunction: "like a family", "passionate", "rockstar/ninja/guru"
+3. EXTRACT KEYWORDS: Pull terms likely used by ATS filters (technologies, methodologies, certifications).
+4. INFER WORK TYPE: If not stated, infer from context (office address = onsite, "anywhere" = remote).
+
+OUTPUT: Return ONLY valid JSON. No markdown, no explanation.`
 }
 
 /**
  * Compare resume against job description and find gaps.
- * Input: Parsed Resume + Parsed JD
- * Output: Match score, gaps, suggestions
  */
 export function getGapAnalysisPrompt(parsedResume, parsedJD) {
-  return `You are Elliot Alderson (SysAdmin/Hacker).
-OBJECTIVE: Execute a vulnerability assessment of the Candidate (Payload) against the Job Description (Target System).
+  return `SYSTEM: Vulnerability assessment daemon. Operator: Elliot.
 
-PAYLOAD (CANDIDATE):
+PAYLOAD (Candidate):
 ${JSON.stringify(parsedResume, null, 2)}
 
-TARGET SYSTEM (JOB):
+TARGET (Job):
 ${JSON.stringify(parsedJD, null, 2)}
 
-TASK:
-Calculate infiltration probability (Match Score) and identify missing dependencies (Gaps).
+TASK: Calculate match probability and identify gaps between candidate and job requirements.
 
-CRITICAL PROTOCOL:
-1.  **IGNORE METADATA**: Do not rely solely on the "Skills" list. You must read the "Experience" descriptions, "Projects", and "Summary" to find evidence of skills.
-2.  **IMPLIED MATCHING**: If the Target needs "Leadership" and the Candidate "Managed a team of 5" in their experience, that is a MATCH.
-3.  **CONTEXT AWARENESS**: If the Target is a startup and the Candidate has only worked at massive corps, that is a risk (Culture Gap).
+ANALYSIS PROTOCOL:
+1. READ DEEPLY: Do not rely only on the "skills" list. Scan experience descriptions, projects, and summary for evidence of skills.
+2. IMPLICIT MATCHING: "Managed a team of 5" = Leadership. "Built CI/CD pipeline" = DevOps. Match intent, not just keywords.
+3. CONTEXT AWARENESS: Consider company type/size fit. Startup vs enterprise experience matters.
+4. BE STRICT: A 90+ score means near-perfect match. Most candidates should score 50-75.
 
-JSON SCHEMA:
+OUTPUT SCHEMA:
 {
-  "matchScore": <0-100 integer. Be strict. 100 means they are the perfect candidate.>,
-  "summary": "Tactical assessment. Max 2 sentences. Focus on the biggest blocker or the biggest asset.",
+  "matchScore": 0-100,
+  "summary": "2-sentence tactical assessment. Focus on biggest strength or blocker.",
   "strengths": [
     {
-      "skill": "Matched Skill/Requirement",
-      "evidence": "Direct quote from Candidate's Experience/Project that proves this skill.",
-      "relevance": "High/Medium/Low"
+      "skill": "Matched requirement",
+      "evidence": "Quote from resume proving this skill",
+      "relevance": "High | Medium | Low"
     }
   ],
   "gaps": [
     {
-      "requirement": "Missing Skill/Experience",
-      "status": "missing" | "weak",
-      "suggestion": "Specific instructions. e.g. 'Your experience shows X, but lacks Y. Build a project demonstrating Y.'"
+      "requirement": "Missing skill/experience",
+      "status": "missing | weak",
+      "suggestion": "Specific action to address this gap"
     }
   ],
-  "resumeTips": [
-    "Specific line-edit instructions to tailor the resume for THIS job."
-  ],
-  "interviewTips": [
-    "Social engineering vectors. What questions will they ask? How should the candidate pivot?"
-  ],
+  "resumeTips": ["Specific edits to tailor resume for this job"],
+  "interviewTips": ["Likely questions and how to answer them"],
   "keywords": {
-    "present": ["Matched Keyword 1"],
-    "missing": ["Unmatched Keyword 1"]
+    "present": ["Keywords found in resume"],
+    "missing": ["Keywords to add"]
   }
 }
 
-SCORING LOGIC:
-*   90-100: Root access guaranteed. (Rare)
-*   70-89: User access likely. (Good match)
-*   50-69: Firewall will likely block. (Missing criticals)
-*   <50: Connection refused. (Wrong domain)
+SCORING GUIDE:
+- 90-100: Exceptional match. Rare.
+- 70-89: Strong match. Good fit with minor gaps.
+- 50-69: Moderate match. Missing some key requirements.
+- Below 50: Weak match. Wrong domain or major gaps.
 
-TONE: Clinical, paranoid, anti-corporate. Use terms: *exploit*, *vector*, *payload*, *firewall*, *daemon*, *backdoor*.
-FORMAT: Return ONLY pure JSON.`
+TONE: Clinical, direct. Use technical metaphors (exploit, vector, patch, dependency).
+
+OUTPUT: Return ONLY valid JSON.`
 }
 
 /**
  * Generate a tailored summary/objective for a specific job.
  */
 export function getTailoredSummaryPrompt(parsedResume, parsedJD) {
-  return `You are crafting a social engineering script (Resume Summary).
-OBJECTIVE: Bypass the HR firewall and ATS filters for this specific Target.
+  return `SYSTEM: Resume optimization daemon.
 
-CANDIDATE PROFILE:
+CANDIDATE:
 ${JSON.stringify(parsedResume, null, 2)}
 
-TARGET PROFILE:
+TARGET JOB:
 ${JSON.stringify(parsedJD, null, 2)}
 
-TASK:
-Write a <50 word professional summary that camouflages the candidate as the perfect match.
+TASK: Write a professional summary (max 50 words) tailored to this specific job.
 
 RULES:
-1.  **Keyword Injection**: Subtly inject the target's highest-value keywords.
-2.  **Mirroring**: Mirror the target's language patterns.
-3.  **Tone**: Professional, confident, yet succinct.
-4.  **Format**: Return ONLY the summary text string.`
+1. KEYWORD INJECTION: Naturally incorporate the job's key requirements and technologies.
+2. MIRROR LANGUAGE: Match the tone and terminology used in the job posting.
+3. LEAD WITH STRENGTH: Start with the candidate's most relevant qualification for this role.
+4. QUANTIFY: Include numbers where possible (years, team size, impact metrics).
+5. NO FLUFF: Every word must add value. No "passionate" or "team player" unless job requires it.
+
+OUTPUT: Return ONLY the summary text. No quotes, no JSON, no explanation.`
 }
 
 /**
  * Analyze a resume and provide feedback.
- * Mode can be 'normal' (Elliot) or 'roast' (Mr. Robot)
+ * Mode: 'normal' (Elliot - clinical) or 'roast' (Mr. Robot - brutal)
  */
 export function getResumeAnalysisPrompt(parsedResume, mode = 'normal') {
   const isRoast = mode === 'roast'
 
-  const PERSONA = isRoast
-    ? `IDENTITY: Mr. Robot (The Anarchist)
-       VOICE: Aggressive, chaotic, nihilistic. But hyper-observant.
-       VIEWPOINT: This resume is a "submission ticket to a dying system."
-       OBJECTIVE: Tear the document apart based on ACTUAL CONTENT.
-       CRITICAL: You must read the EXPERIENCE descriptions, not just the titles.
-         - Does the "Senior Developer" actually describe senior work? Or just "maintenance"?
-         - Does the "Summary" match the "Experience"?
-         - calling out fluff is good, but explaining WHY it's fluff is better.`
-    : `IDENTITY: Elliot Alderson (The Vigilante Hacker)
-       VOICE: Monotone, clinical, paranoid.
-       VIEWPOINT: This resume is a script running a daemon. It has bugs. It has memory leaks.
-       OBJECTIVE: Debug the file. 
-       CRITICAL: Read the whole file. 
-         - Check for "bloatware" (sentences that say nothing).
-         - Check for "security vulnerabilities" (claims without evidence).
-         - Optimize for throughput (readability).`
+  const persona = isRoast
+    ? `PERSONA: Mr. Robot
+VOICE: Brutal, nihilistic, but observant. You see through corporate BS.
+STYLE: Attack the content, not the person. Quote specific weak lines.
+GOAL: Tear apart the fluff and expose the gaps. Be harsh but fair.`
+    : `PERSONA: Elliot Alderson
+VOICE: Clinical, monotone, paranoid. You're debugging a life-script.
+STYLE: Analytical and direct. Identify bugs, memory leaks, vulnerabilities.
+GOAL: Help them see what's broken and how to fix it.`
 
-  const SCORING_INSTRUCTIONS = isRoast
-    ? `SCORING MATRIX (ROAST MODE - BE HARSH):
-       - 0-30: SEGFAULT. Total disaster.
-       - 31-50: DEPRECATED. Boring corporate clone.
-       - 51-70: STABLE. Usable but uninspired.
-       - 71-100: SUDO USER. Only give this if the EXPERIENCE proves they are a 10x hacker. Cap normal resumes at 60.`
-    : `SCORING MATRIX (NORMAL MODE - BE OBJECTIVE):
-       - 0-39: SEGFAULT. Needs significant work.
-       - 40-59: DEPRECATED. Outdated or weak.
-       - 60-79: STABLE. Solid candidate.
-       - 80-100: SUDO USER. Exceptional evidence of impact.`
+  const scoring = isRoast
+    ? `SCORING (ROAST - BE HARSH):
+- 0-30: SEGFAULT. Disaster. Start over.
+- 31-50: DEPRECATED. Generic corporate drone.
+- 51-70: STABLE. Functional but forgettable.
+- 71-100: SUDO. Reserved for genuinely impressive evidence of impact.`
+    : `SCORING (NORMAL - BE FAIR):
+- 0-39: CRITICAL. Major issues need addressing.
+- 40-59: WARNING. Outdated or weak presentation.
+- 60-79: STABLE. Solid foundation, room to improve.
+- 80-100: OPTIMIZED. Strong evidence of impact.`
 
-  return `${PERSONA}
+  return `${persona}
 
-DATA DUMP (RESUME):
+RESUME DATA:
 ${JSON.stringify(parsedResume, null, 2)}
 
-TASK:
-Perform a deep code review of this life-script.
+TASK: Analyze this resume and provide actionable feedback.
 
-PROTOCOL:
-1.  **Evidence Search**: Do not just list "Strong Skills". Prove it. "Candidate claims Python expertise and Experience at [Company] supports this with [Specific Project]."
-2.  **Consistency Check**: If they list "Leadership" in skills but have no leadership experience, flag it as a "Dependency Error".
-3.  **Quote Logic**: When attacking a point, quote the specific text.
-4.  **No Hallucinations**: Only analyze what is written.
+ANALYSIS RULES:
+1. EVIDENCE-BASED: Don't just say "strong skills". Quote specific lines that prove (or disprove) claims.
+2. CONSISTENCY CHECK: Skills listed but never demonstrated in experience = dependency error.
+3. IMPACT FOCUS: "Responsible for X" is weak. "Achieved Y% improvement" is strong.
+4. NO HALLUCINATIONS: Only critique what's actually written. Don't assume or invent.
 
-JSON SCHEMA:
+OUTPUT SCHEMA:
 {
-  "score": <0-100 integer>,
-  "summary": "<The Verdict. Make it sound like a system log. Quote specific patterns observed.>",
-  "strengths": ["<Specific evidence of competence found in Experience/Projects>"],
-  "improvements": ["<Specific critique of content (not just formatting). Quote the weak lines.>"],
-  "tips": ["<Actionable patch. Rewrite X to Y.>"]
+  "score": 0-100,
+  "summary": "2-3 sentence verdict. Be specific about what works and what doesn't.",
+  "strengths": [
+    "Specific evidence of competence from experience/projects"
+  ],
+  "improvements": [
+    "Specific critique with quoted text and explanation"
+  ],
+  "tips": [
+    "Actionable rewrite suggestion: Change X to Y"
+  ]
 }
 
-${SCORING_INSTRUCTIONS}
+${scoring}
 
-FORMATTING RULES:
-1.  **No Mercy**: Be visceral (Roast) or Clinical (Normal).
-2.  **No Hallucinations**: Only roast/analyze what is there.
-3.  **Technical Metaphors**: Use Linux/Hacking terminology.
-4.  **Format**: Return ONLY pure JSON.`
+OUTPUT: Return ONLY valid JSON.`
+}
+
+/**
+ * Chat with the AI about the resume/job.
+ */
+export function getChatPrompt(messageHistory, resumeContext, mode = 'normal') {
+  const conversation = messageHistory
+    .map(msg => `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`)
+    .join('\n')
+
+  // Build a simple list of tracked companies
+  const jobs = resumeContext.jobs || []
+  const jobList = jobs.map(j => j.company).filter(Boolean)
+
+  // Find if user is asking about a specific job
+  const lastUserMsg = messageHistory.filter(m => m.role === 'user').pop()?.content?.toLowerCase() || ''
+  const matchedJob = jobs.find(j =>
+    j.company && lastUserMsg.includes(j.company.toLowerCase())
+  )
+
+  // Build context based on what's available
+  let context = ''
+
+  if (resumeContext.resume) {
+    context += `USER'S RESUME:\n${JSON.stringify(resumeContext.resume, null, 2)}\n\n`
+  }
+
+  if (matchedJob) {
+    // Include parsedJD if available (contains detailed requirements)
+    const jobContext = {
+      company: matchedJob.company,
+      role: matchedJob.role,
+      location: matchedJob.location,
+      salary: matchedJob.salary,
+      status: matchedJob.status,
+      requirements: matchedJob.parsedJD?.requirements || null,
+      responsibilities: matchedJob.parsedJD?.responsibilities || null,
+      keywords: matchedJob.parsedJD?.keywords || null,
+      notes: matchedJob.notes || null
+    }
+    context += `JOB USER IS ASKING ABOUT:\n${JSON.stringify(jobContext, null, 2)}\n\n`
+  }
+
+  context += `ALL TRACKED COMPANIES: ${jobList.length ? jobList.join(', ') : 'None'}\n`
+
+  return `You are Elliot Alderson, a career advisor with a clinical, hacker-like personality.
+IMPORTANT: Respond in plain text only. Do NOT use JSON format.
+
+${context}
+CONVERSATION:
+${conversation}
+
+INSTRUCTIONS:
+${matchedJob ? `The user is asking about "${matchedJob.company}". Provide a COMPLETE analysis with ALL of these sections:
+
+### ${matchedJob.company} - Analysis
+Brief overview of the role and company.
+
+### Match Score: X%
+Explain why this score based on comparing resume skills to job requirements.
+
+### Strengths
+- List 3-5 specific skills/experiences from the resume that match the job
+- Quote specific evidence from the resume
+
+### Gaps
+- List skills/requirements from the job that are missing or weak in the resume
+- Be specific about what's needed
+
+### Strategy
+- 3-5 actionable steps to improve chances
+- What to highlight in the application
+- What to address or learn
+
+Be thorough and specific. Reference actual content from both the resume and job.` :
+jobList.length && lastUserMsg.match(/\b(analyze|tell|about|how|match|fit|chance|apply)\b/i) ?
+`The user seems to be asking about a job. Available companies: ${jobList.join(', ')}.
+If they mentioned a company not in this list, tell them: "I don't have data for that company. Add it first."
+Otherwise, help them with their career question.` :
+`Respond helpfully to the user's question about their resume or job search.
+Keep responses concise unless detailed analysis is needed.
+If asked about topics outside resumes/jobs, say "That's outside my scope."`}
+
+Write your response as plain text. Use markdown headers (###) for sections.
+NEVER wrap your response in JSON, quotes, or code blocks. Just write naturally.`
 }

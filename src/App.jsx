@@ -60,7 +60,9 @@ function App() {
   const [showResumeUpload, setShowResumeUpload] = useState(false)
   const [showContactModal, setShowContactModal] = useState(false)
   const [editingContact, setEditingContact] = useState(null)
+
   const [editingJob, setEditingJob] = useState(null)
+  const [deleteConfirmation, setDeleteConfirmation] = useState(null) // { type: 'job'|'resume', id: string, name: string }
 
   // Derived State
   const isDemo = data?.isDemo === true
@@ -129,20 +131,34 @@ function App() {
   }
 
   const handleResumeDelete = async () => {
-    if (window.confirm('Delete your resume? This cannot be undone.')) {
-      await updateAndSave('resume', null)
-    }
+    setDeleteConfirmation({
+      type: 'resume',
+      title: 'Purge Resume Data?',
+      message: 'This will wipe your dossier from local storage. You will need to re-upload to continue analysis.'
+    })
   }
 
   const handleAddApplication = async (appData) => {
     let gapAnalysis = appData.gapAnalysis
-    if (!gapAnalysis && data?.resume && appData.parsedJD) {
+
+    // Only run auto-analysis if not already present and we have the data
+    if (!gapAnalysis && data?.resume && appData.parsedJD && !appData.gapAnalysis) {
       const result = await analyzeGap(data.resume, appData.parsedJD)
       if (result.success) {
         gapAnalysis = result.data
       }
     }
-    await addApplication({ ...appData, gapAnalysis })
+
+    const finalData = { ...appData, gapAnalysis }
+
+    if (appData.id) {
+      // It's an update!
+      await handleUpdateJob(appData.id, finalData)
+    } else {
+      // It's a new job
+      await addApplication(finalData)
+    }
+
     setShowAddAppModal(false)
     setEditingJob(null)
   }
@@ -155,10 +171,26 @@ function App() {
   }
 
   const handleDeleteJob = async (jobId) => {
-    if (window.confirm('Delete this application?')) {
-      const updated = (data?.applications || []).filter(a => a.id !== jobId)
+    const job = data?.applications?.find(a => a.id === jobId)
+    setDeleteConfirmation({
+      type: 'job',
+      id: jobId,
+      title: job?.company ? `Remove target: ${job.company}?` : 'Remove this target?',
+      message: 'This will delete the job and all associated notes. The system cannot recover this data.'
+    })
+  }
+
+  const confirmDelete = async () => {
+    if (!deleteConfirmation) return
+
+    if (deleteConfirmation.type === 'job') {
+      const updated = (data?.applications || []).filter(a => a.id !== deleteConfirmation.id)
       await updateAndSave('applications', updated)
+    } else if (deleteConfirmation.type === 'resume') {
+      await updateAndSave('resume', null)
     }
+
+    setDeleteConfirmation(null)
   }
 
   const handleUpdateJob = async (jobId, updates) => {
@@ -382,6 +414,33 @@ function App() {
           error={aiError}
           onCancel={() => { cancel(); setShowAddAppModal(false); setEditingJob(null); }}
         />
+      </Modal>
+      <Modal
+        isOpen={!!deleteConfirmation}
+        onClose={() => setDeleteConfirmation(null)}
+        title="Confirm Deletion"
+        size="sm"
+      >
+        <div className="confirmation-modal" style={{ padding: '0 1rem 1rem' }}>
+          <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem', color: 'var(--color-text)' }}>
+            {deleteConfirmation?.title}
+          </h3>
+          <p style={{ color: 'var(--color-text-secondary)', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
+            {deleteConfirmation?.message}
+          </p>
+          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+            <Button variant="outline" onClick={() => setDeleteConfirmation(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              onClick={confirmDelete}
+              style={{ background: 'var(--color-error)', borderColor: 'var(--color-error)' }}
+            >
+              Delete Target
+            </Button>
+          </div>
+        </div>
       </Modal>
     </Layout>
   )

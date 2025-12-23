@@ -1,0 +1,136 @@
+.terminal-chat {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 400px;
+    height: 500px;
+    background-color: rgba(10, 10, 10, 0.95);
+    border: 1px solid var(--color-primary);
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.1);
+    z-index: 1000;
+    font-family: 'Fira Code', 'Courier New', monospace;
+    overflow: hidden;
+    transition: height 0.3s ease;
+}
+
+.terminal-chat.minimized {
+    height: 40px;
+}
+
+.terminal-header {
+    background-color: var(--color-bg-dark);
+    border-bottom: 1px solid var(--color-primary);
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+.terminal-title {
+    color: var(--color-primary);
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+.terminal-controls button {
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    font-family: inherit;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 8px;
+    padding: 0 4px;
+}
+
+.terminal-controls button:hover {
+    color: var(--color-primary);
+}
+
+.terminal-body {
+    flex: 1;
+    padding: 12px;
+    overflow-y: auto;
+    color: var(--color-text-main);
+    font-size: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.terminal-line {
+    display: flex;
+    gap: 8px;
+    line-height: 1.4;
+    white-space: pre-wrap;
+}
+
+.terminal-line.user .prompt {
+    color: var(--color-accent);
+}
+
+.terminal-line.assistant .prompt {
+    color: var(--color-primary);
+}
+
+.terminal-line.assistant {
+    color: var(--color-text-main);
+}
+
+.terminal-line.user {
+    color: var(--color-text-light);
+}
+
+.terminal-input-form {
+    border-top: 1px solid var(--color-border);
+    padding: 10px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.input-prompt {
+    color: var(--color-accent);
+    font-weight: bold;
+}
+
+.terminal-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-family: inherit;
+    font-size: 0.9rem;
+    outline: none;
+}
+
+.cursor-blink {
+    animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+}
+
+@media (max-width: 600px) {
+    .terminal-chat {
+        width: 100%;
+        right: 0;
+        bottom: 0;
+        border-radius: 0;
+    }
+}
