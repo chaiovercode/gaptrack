@@ -257,7 +257,7 @@
 /* ========== FOOTER ========== */
 .landing-footer {
   background: #000000;
-  border-top: 1px solid #000000;
+  border-top: 1px solid var(--color-border);
 }
 
 .landing-footer-inner {
