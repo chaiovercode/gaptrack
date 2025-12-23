@@ -172,16 +172,21 @@ function Layout({
         {/* Footer */}
         <footer className="footer">
           <p className="footer-text">
-            your data stays local. where it belongs.{' '}
-            <a
-              href="https://github.com/chaiovercode/gaptrack"
-              className="footer-link"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            your data stays local. where it belongs.
+          </p>
+          <div className="footer-links">
+            <a href="https://chaiovercode.com" className="footer-link" target="_blank" rel="noopener noreferrer">
+              website
+            </a>
+            <span className="footer-separator">•</span>
+            <a href="https://github.com/chaiovercode" className="footer-link" target="_blank" rel="noopener noreferrer">
               github
             </a>
-          </p>
+            <span className="footer-separator">•</span>
+            <a href="https://www.linkedin.com/in/vivektiwari13/" className="footer-link" target="_blank" rel="noopener noreferrer">
+              linkedin
+            </a>
+          </div>
         </footer>
       </div>
     </div>

@@ -277,7 +277,8 @@
 
 .footer-links {
   display: flex;
-  gap: var(--space-4);
+  align-items: center;
+  gap: var(--space-2);
 }
 
 .footer-link {
@@ -290,6 +291,11 @@
 
 .footer-link:hover {
   color: var(--color-primary);
+}
+
+.footer-separator {
+  color: #404040;
+  font-size: var(--font-size-sm);
 }
 
 .footer-bottom {

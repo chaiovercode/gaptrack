@@ -187,13 +187,16 @@ function LandingPage({ onGetStarted, onDemo }) {
             <span className="footer-logo-text">gaptrack_daemon_v1.0</span>
           </div>
           <div className="footer-links">
-            <a
-              href="https://github.com/chaiovercode/gaptrack"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="footer-link"
-            >
-              /src
+            <a href="https://chaiovercode.com" target="_blank" rel="noopener noreferrer" className="footer-link">
+              website
+            </a>
+            <span className="footer-separator">•</span>
+            <a href="https://github.com/chaiovercode" target="_blank" rel="noopener noreferrer" className="footer-link">
+              github
+            </a>
+            <span className="footer-separator">•</span>
+            <a href="https://www.linkedin.com/in/vivektiwari13/" target="_blank" rel="noopener noreferrer" className="footer-link">
+              linkedin
             </a>
           </div>
         </div>
