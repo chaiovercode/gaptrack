@@ -4,7 +4,59 @@
  * Sections: Navbar, Hero, Features, How It Works, Footer
  * Mr. Robot inspired dark, minimal aesthetic.
  */
+import { useState, useEffect, useRef } from 'react'
 import './LandingPage.css'
+
+// Matrix-style decrypt animation hook
+const useDecrypt = (text, speed = 50) => {
+  const [displayText, setDisplayText] = useState(text)
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+"
+
+  useEffect(() => {
+    let iteration = 0
+    let interval = null
+
+    // Start slightly scrambled
+    setDisplayText(text.split('').map((char, index) => {
+      if (char === ' ') return ' '
+      return chars[Math.floor(Math.random() * chars.length)]
+    }).join(''))
+
+    const startAnimation = () => {
+      clearInterval(interval)
+      interval = setInterval(() => {
+        setDisplayText(prev =>
+          text.split('').map((char, index) => {
+            if (index < iteration) return text[index]
+            if (char === ' ') return ' '
+            return chars[Math.floor(Math.random() * chars.length)]
+          }).join('')
+        )
+
+        if (iteration >= text.length) {
+          clearInterval(interval)
+        }
+
+        iteration += 1 / 3
+      }, speed)
+    }
+
+    // Small delay before starting
+    const timeout = setTimeout(startAnimation, 500)
+
+    return () => {
+      clearInterval(interval)
+      clearTimeout(timeout)
+    }
+  }, [text, speed])
+
+  return displayText
+}
+
+const DecryptText = ({ text }) => {
+  const decrypted = useDecrypt(text)
+  return <span>{decrypted}</span>
+}
 
 function LandingPage({ onGetStarted, onDemo }) {
   const scrollToFeatures = () => {
@@ -30,7 +82,7 @@ function LandingPage({ onGetStarted, onDemo }) {
       <section className="landing-hero">
         <div className="landing-hero-content">
           <h1 className="landing-hero-title">
-            hello friend.<span className="cursor-blink">|</span>
+            <DecryptText text="hello friend." /><span className="cursor-blink">|</span>
           </h1>
           <p className="landing-hero-subtitle">
             we're all stuck in the same loop. wake up. work. sleep. repeat.

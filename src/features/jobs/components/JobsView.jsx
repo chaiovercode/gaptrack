@@ -306,7 +306,7 @@ function JobsView({
   }
 
   const pipeline = [
-    { key: 'discovered', label: 'Targeted', color: '#94a3b8', count: getCumulativeCount(0) },
+    { key: 'discovered', label: 'Targeted', color: '#94a3b8', count: jobsList.length },
     { key: 'applied', label: 'Applied', color: '#6366f1', count: getCumulativeCount(1) },
     { key: 'screening', label: 'Screening', color: '#8b5cf6', count: getCumulativeCount(2) },
     { key: 'interview', label: 'Interview', color: '#f59e0b', count: getCumulativeCount(3) },

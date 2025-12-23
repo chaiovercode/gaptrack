@@ -1,12 +1,20 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { HashRouter } from 'react-router-dom'
 import './styles/index.css'
 import App from './App.jsx'
+import { StorageProvider } from './context/StorageContext'
+import { AIProvider } from './context/AIContext'
 
 // This is where React starts
-// It finds the #root div in index.html and renders <App /> inside it
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <StorageProvider>
+      <AIProvider>
+        <HashRouter>
+          <App />
+        </HashRouter>
+      </AIProvider>
+    </StorageProvider>
   </StrictMode>,
 )

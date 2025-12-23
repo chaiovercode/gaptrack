@@ -32,7 +32,6 @@ function Layout({
   ]
 
   const handleNavigate = (view) => {
-    window.location.hash = view
     onNavigate(view)
     setSidebarOpen(false)
   }
