@@ -53,6 +53,11 @@
   gap: var(--space-2);
 }
 
+.landing-logo-icon {
+  width: 32px;
+  height: 32px;
+}
+
 .landing-logo-text {
   font-size: var(--font-size-lg);
   font-weight: 700;
@@ -252,7 +257,7 @@
 /* ========== FOOTER ========== */
 .landing-footer {
   background: #000000;
-  border-top: 1px solid #1a1a1a;
+  border-top: 1px solid #000000;
 }
 
 .landing-footer-inner {
