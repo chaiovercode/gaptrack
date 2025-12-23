@@ -24,7 +24,7 @@ const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/
  * @param {string} prompt - The prompt to send
  * @returns {Object} { success: boolean, text?: string, error?: string }
  */
-export async function callGemini(apiKey, prompt) {
+export async function callGemini(apiKey, prompt, signal) {
   try {
     console.log('Calling Gemini API...')
     const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
@@ -44,7 +44,8 @@ export async function callGemini(apiKey, prompt) {
           topP: 0.95,
           maxOutputTokens: 8192,
         }
-      })
+      }),
+      signal
     })
 
     if (!response.ok) {

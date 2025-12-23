@@ -25,7 +25,7 @@ const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions'
  * @param {string} model - Model to use (default: gpt-4o-mini)
  * @returns {Object} { success: boolean, text?: string, error?: string }
  */
-export async function callOpenAI(apiKey, prompt, model = 'gpt-4o-mini') {
+export async function callOpenAI(apiKey, prompt, signal, model = 'gpt-4o-mini') {
   try {
     const response = await fetch(OPENAI_API_URL, {
       method: 'POST',
@@ -40,7 +40,8 @@ export async function callOpenAI(apiKey, prompt, model = 'gpt-4o-mini') {
         ],
         temperature: 0.7,
         max_tokens: 4096
-      })
+      }),
+      signal
     })
 
     if (!response.ok) {
