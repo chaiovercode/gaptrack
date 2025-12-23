@@ -61,7 +61,8 @@ function Layout({
               }}
               title="Go to homepage"
             >
-              <span className="navbar-logo-text">&gt; gaptrack_</span>
+              <img src="favicon.svg" alt="GapTrack" className="navbar-logo-icon" />
+              <span className="navbar-logo-text">gaptrack</span>
             </a>
           </div>
 

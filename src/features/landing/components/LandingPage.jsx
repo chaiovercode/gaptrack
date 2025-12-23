@@ -17,7 +17,8 @@ function LandingPage({ onGetStarted, onDemo }) {
       <nav className="landing-nav">
         <div className="landing-nav-inner">
           <div className="landing-logo">
-            <span className="landing-logo-text">&gt; gaptrack_</span>
+            <img src="favicon.svg" alt="GapTrack" className="landing-logo-icon" />
+            <span className="landing-logo-text">gaptrack</span>
           </div>
           <button className="landing-cta-btn" onClick={onGetStarted}>
             sudo start
