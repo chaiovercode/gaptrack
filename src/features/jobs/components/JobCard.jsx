@@ -7,6 +7,7 @@ import { useState, useRef, useEffect } from 'react'
 import './JobCard.css'
 
 const STATUSES = [
+  { value: 'discovered', label: 'Targeted', color: '#94a3b8' },
   { value: 'applied', label: 'Applied', color: '#6366f1' },
   { value: 'screening', label: 'Screening', color: '#8b5cf6' },
   { value: 'interview', label: 'Interviewing', color: '#f59e0b' },
