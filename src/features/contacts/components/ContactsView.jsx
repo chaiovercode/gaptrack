@@ -25,7 +25,9 @@ function ContactsView({
   const [search, setSearch] = useState('')
   const [companyFilter, setCompanyFilter] = useState('all')
   const [roleDropdownOpen, setRoleDropdownOpen] = useState(false)
+  const [companyDropdownOpen, setCompanyDropdownOpen] = useState(false)
   const roleDropdownRef = useRef(null)
+  const companyDropdownRef = useRef(null)
   const fileInputRef = useRef(null)
 
   // Inline add state
@@ -41,11 +43,14 @@ function ContactsView({
     notes: ''
   })
 
-  // Close dropdown on outside click
+  // Close dropdowns on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (roleDropdownRef.current && !roleDropdownRef.current.contains(e.target)) {
         setRoleDropdownOpen(false)
+      }
+      if (companyDropdownRef.current && !companyDropdownRef.current.contains(e.target)) {
+        setCompanyDropdownOpen(false)
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
@@ -346,17 +351,47 @@ function ContactsView({
           </div>
 
           {companies.length > 1 && (
-            <div className="contacts-filter">
+            <div className="contacts-filter" ref={companyDropdownRef}>
               <label>company</label>
-              <select
-                value={companyFilter}
-                onChange={(e) => setCompanyFilter(e.target.value)}
-              >
-                <option value="all">all companies</option>
-                {companies.map(company => (
-                  <option key={company} value={company}>{company}</option>
-                ))}
-              </select>
+              <div className="custom-dropdown filter-dropdown">
+                <button
+                  type="button"
+                  className={`custom-dropdown-trigger ${companyDropdownOpen ? 'open' : ''}`}
+                  onClick={() => setCompanyDropdownOpen(!companyDropdownOpen)}
+                >
+                  <span className={companyFilter === 'all' ? 'placeholder' : ''}>
+                    {companyFilter === 'all' ? 'all companies' : companyFilter}
+                  </span>
+                  <span className="dropdown-arrow">▼</span>
+                </button>
+                {companyDropdownOpen && (
+                  <div className="custom-dropdown-options">
+                    <button
+                      type="button"
+                      className={`custom-dropdown-option ${companyFilter === 'all' ? 'selected' : ''}`}
+                      onClick={() => {
+                        setCompanyFilter('all')
+                        setCompanyDropdownOpen(false)
+                      }}
+                    >
+                      all companies
+                    </button>
+                    {companies.map(company => (
+                      <button
+                        key={company}
+                        type="button"
+                        className={`custom-dropdown-option ${companyFilter === company ? 'selected' : ''}`}
+                        onClick={() => {
+                          setCompanyFilter(company)
+                          setCompanyDropdownOpen(false)
+                        }}
+                      >
+                        {company}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           )}
 

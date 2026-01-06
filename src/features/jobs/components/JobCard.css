@@ -84,6 +84,22 @@
   color: var(--color-text-muted);
 }
 
+.job-link {
+  display: inline-flex;
+  align-items: center;
+  margin-left: var(--space-1);
+  color: var(--color-text-muted);
+  transition: color 0.15s ease;
+}
+
+.job-link:hover {
+  color: var(--color-primary);
+}
+
+.job-link svg {
+  display: block;
+}
+
 .job-contacts {
   display: flex;
   gap: var(--space-1);

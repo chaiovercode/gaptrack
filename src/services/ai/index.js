@@ -141,14 +141,6 @@ export function createAIService(settings) {
      * Analyze gaps between resume and job description
      */
     async analyzeGap(parsedResume, parsedJD, signal) {
-      // Debug: Log what we're sending to the AI
-      console.log('=== GAP ANALYSIS INPUT ===')
-      console.log('Resume skills:', parsedResume?.skills)
-      console.log('Resume experience count:', parsedResume?.experience?.length || 0)
-      console.log('JD must-haves:', parsedJD?.requirements?.mustHave)
-      console.log('JD role:', parsedJD?.role, '@ company:', parsedJD?.company)
-      console.log('==========================')
-
       const prompt = getGapAnalysisPrompt(parsedResume, parsedJD)
       const result = await call(prompt, signal)
 
@@ -160,13 +152,6 @@ export function createAIService(settings) {
       if (!parsed) {
         return { success: false, error: 'Failed to parse AI response as JSON' }
       }
-
-      // Debug: Log the match score returned by AI
-      console.log('=== GAP ANALYSIS RESULT ===')
-      console.log('Match Score:', parsed.matchScore)
-      console.log('Summary:', parsed.summary)
-      console.log('Full result:', JSON.stringify(parsed, null, 2))
-      console.log('===========================')
 
       return { success: true, data: parsed }
     },

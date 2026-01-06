@@ -27,7 +27,7 @@ function JobCard({
   const [showStatusDropdown, setShowStatusDropdown] = useState(false)
   const dropdownRef = useRef(null)
 
-  const { company, role, location, status, gapAnalysis, linkedContacts = [] } = job
+  const { company, role, location, status, gapAnalysis, linkedContacts = [], link } = job
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -76,6 +76,22 @@ function JobCard({
                   <span className="meta-dot">•</span>
                   <span className="job-location">{location}</span>
                 </>
+              )}
+              {link && (
+                <a
+                  href={link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="job-link"
+                  onClick={(e) => e.stopPropagation()}
+                  title="Open job posting"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                    <polyline points="15 3 21 3 21 9" />
+                    <line x1="10" y1="14" x2="21" y2="3" />
+                  </svg>
+                </a>
               )}
             </div>
             {jobContacts.length > 0 && (
