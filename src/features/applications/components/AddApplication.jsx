@@ -256,7 +256,8 @@ the more detail, the better i can find your gaps before they do."
                   </span>
                   <div className="match-details">
                     <h4>
-                      {matchPreview.matchScore >= 70 ? 'you\'re in good shape' :
+                      {matchPreview.matchScore >= 85 ? 'strong match' :
+                        matchPreview.matchScore >= 70 ? 'you\'re in good shape' :
                         matchPreview.matchScore >= 50 ? 'survivable odds' : 'uphill battle'}
                     </h4>
                     <p>{matchPreview.summary}</p>

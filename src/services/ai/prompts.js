@@ -122,11 +122,11 @@ ANALYSIS PROTOCOL:
 1. READ DEEPLY: Do not rely only on the "skills" list. Scan experience descriptions, projects, and summary for evidence of skills.
 2. IMPLICIT MATCHING: "Managed a team of 5" = Leadership. "Built CI/CD pipeline" = DevOps. Match intent, not just keywords.
 3. CONTEXT AWARENESS: Consider company type/size fit. Startup vs enterprise experience matters.
-4. BE STRICT: A 90+ score means near-perfect match. Most candidates should score 50-75.
+4. VARIED SCORING: Use the FULL 0-100 range. Don't cluster around 70-80. A strong match should score 85+.
 
 OUTPUT SCHEMA:
 {
-  "matchScore": 0-100,
+  "matchScore": 0-100 (use full range - don't default to 70-80),
   "summary": "2-sentence tactical assessment. Focus on biggest strength or blocker.",
   "strengths": [
     {
@@ -150,11 +150,12 @@ OUTPUT SCHEMA:
   }
 }
 
-SCORING GUIDE:
-- 90-100: Exceptional match. Rare.
-- 70-89: Strong match. Good fit with minor gaps.
-- 50-69: Moderate match. Missing some key requirements.
-- Below 50: Weak match. Wrong domain or major gaps.
+SCORING GUIDE (be generous, use full range):
+- 90-100: Excellent match. Meets most requirements with relevant experience.
+- 80-89: Strong match. Good fit, minor gaps that can be learned.
+- 65-79: Decent match. Has core skills but missing some requirements.
+- 50-64: Partial match. Transferable skills but significant gaps.
+- Below 50: Weak match. Different domain or missing critical requirements.
 
 TONE: Clinical, direct. Use technical metaphors (exploit, vector, patch, dependency).
 

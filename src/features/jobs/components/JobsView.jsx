@@ -296,22 +296,16 @@ function JobsView({
 
   const activeFilterCount = Object.values(filters).filter(v => v !== 'all').length
 
-  // Calculate pipeline stats (Cumulative Funnel)
-  const activeJobs = jobsList.filter(j => !['rejected', 'withdrawn'].includes(j.status))
-
-  const getCumulativeCount = (minStageIndex) => {
-    const stages = ['discovered', 'applied', 'screening', 'interview', 'offer', 'accepted']
-    const validStatuses = stages.slice(minStageIndex)
-    return activeJobs.filter(j => validStatuses.includes(j.status)).length
-  }
+  // Calculate pipeline stats (Non-cumulative - each status shows only jobs in that exact status)
+  const getStatusCount = (status) => jobsList.filter(j => j.status === status).length
 
   const pipeline = [
-    { key: 'discovered', label: 'Targeted', color: '#94a3b8', count: jobsList.length },
-    { key: 'applied', label: 'Applied', color: '#6366f1', count: getCumulativeCount(1) },
-    { key: 'screening', label: 'Screening', color: '#8b5cf6', count: getCumulativeCount(2) },
-    { key: 'interview', label: 'Interview', color: '#f59e0b', count: getCumulativeCount(3) },
-    { key: 'offer', label: 'Offer', color: '#10b981', count: getCumulativeCount(4) },
-    { key: 'accepted', label: 'Accepted', color: '#059669', count: getCumulativeCount(5) },
+    { key: 'discovered', label: 'Targeted', color: '#94a3b8', count: getStatusCount('discovered') },
+    { key: 'applied', label: 'Applied', color: '#6366f1', count: getStatusCount('applied') },
+    { key: 'screening', label: 'Screening', color: '#8b5cf6', count: getStatusCount('screening') },
+    { key: 'interview', label: 'Interview', color: '#f59e0b', count: getStatusCount('interview') },
+    { key: 'offer', label: 'Offer', color: '#10b981', count: getStatusCount('offer') },
+    { key: 'accepted', label: 'Accepted', color: '#059669', count: getStatusCount('accepted') },
   ]
 
   const rejected = jobsList.filter(j => j.status === 'rejected').length
