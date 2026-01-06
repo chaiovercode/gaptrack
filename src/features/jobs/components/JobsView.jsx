@@ -300,7 +300,7 @@ function JobsView({
   const getStatusCount = (status) => jobsList.filter(j => j.status === status).length
 
   const pipeline = [
-    { key: 'discovered', label: 'Targeted', color: '#94a3b8', count: getStatusCount('discovered') },
+    { key: 'discovered', label: 'Targeted', color: '#94a3b8', count: jobsList.length },
     { key: 'applied', label: 'Applied', color: '#6366f1', count: getStatusCount('applied') },
     { key: 'screening', label: 'Screening', color: '#8b5cf6', count: getStatusCount('screening') },
     { key: 'interview', label: 'Interview', color: '#f59e0b', count: getStatusCount('interview') },
