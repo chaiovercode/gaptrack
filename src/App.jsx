@@ -52,7 +52,10 @@ function App() {
 
   // Local UI State
   const [resumeAnalysis, setResumeAnalysis] = useState(null)
-  const [hasStartedSetup, setHasStartedSetup] = useState(false)
+  const [hasStartedSetup, setHasStartedSetup] = useState(() => {
+    // Check if user has already completed setup (has data stored)
+    return localStorage.getItem('gaptrack-setup-complete') === 'true'
+  })
   const [viewMode, setViewMode] = useState('list')
 
   // Modals
@@ -97,6 +100,7 @@ function App() {
   }
 
   const handleLogoClick = () => {
+    localStorage.removeItem('gaptrack-setup-complete')
     setHasStartedSetup(false)
     navigate('/')
   }
@@ -105,7 +109,7 @@ function App() {
     if (isDemo || data?.resume?.name === 'Elliot Alderson') {
       try {
         await save(null)
-        localStorage.clear()
+        localStorage.removeItem('gaptrack-setup-complete')
       } catch (e) {
         console.error('Error clearing data:', e)
       }
@@ -114,6 +118,13 @@ function App() {
       setHasStartedSetup(true)
     }, 50)
   }
+
+  // Mark setup as complete when user has configured storage and AI
+  useEffect(() => {
+    if (hasConfiguredStorage && data?.settings?.aiProvider) {
+      localStorage.setItem('gaptrack-setup-complete', 'true')
+    }
+  }, [hasConfiguredStorage, data?.settings?.aiProvider])
 
   // --- Handlers ---
   const handleResumeParse = async (resumeText) => {
@@ -240,7 +251,9 @@ function App() {
     )
   }
 
-  if (!hasStartedSetup) {
+  // Show landing page only if setup hasn't started AND user doesn't have a fully configured app
+  const isFullyConfigured = hasConfiguredStorage && data?.settings?.aiProvider
+  if (!hasStartedSetup && !isFullyConfigured) {
     return <LandingPage onGetStarted={handleStart} onDemo={handleDemo} />
   }
 
