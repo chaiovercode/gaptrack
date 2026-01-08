@@ -104,7 +104,9 @@ function JobsView({
   onAddJob,
   onStatusChange,
   onDeleteJob,
-  onEditJob
+  onEditJob,
+  onReanalyzeAll,
+  isReanalyzing
 }) {
   const dailyQuote = getDailyQuote()
   const jobsList = Array.isArray(jobs) ? jobs : []
@@ -464,6 +466,19 @@ function JobsView({
           <span className="filter-icon" />
           {activeFilterCount > 0 && <span className="filter-badge">{activeFilterCount}</span>}
         </button>
+        {jobsList.length > 0 && onReanalyzeAll && (
+          <button
+            className="csv-btn"
+            onClick={onReanalyzeAll}
+            disabled={isReanalyzing}
+            title="Re-analyze all jobs"
+            style={{ opacity: isReanalyzing ? 0.5 : 1 }}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+            </svg>
+          </button>
+        )}
         {jobsList.length > 0 && (
           <button
             className="csv-btn"

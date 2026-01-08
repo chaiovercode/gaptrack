@@ -121,8 +121,8 @@ TASK: Calculate match probability and identify gaps between candidate and job re
 ANALYSIS PROTOCOL:
 1. READ DEEPLY: Do not rely only on the "skills" list. Scan experience descriptions, projects, and summary for evidence of skills.
 2. IMPLICIT MATCHING: "Managed a team of 5" = Leadership. "Built CI/CD pipeline" = DevOps. Match intent, not just keywords.
-3. CONTEXT AWARENESS: Consider company type/size fit. Startup vs enterprise experience matters.
-4. VARIED SCORING: Use the FULL 0-100 range. Don't cluster around 70-80. A strong match should score 85+.
+3. CONTEXT AWARENESS: Consider company type/size fit. Startup vs enterprise experience matters. Top-tier companies (FAANG, OpenAI, etc.) have extremely high bars.
+4. BE REALISTIC: Most candidates score 40-65. Scores above 75 should be rare and justified. An 80+ score means "strong interview likelihood" - don't give this lightly.
 
 OUTPUT SCHEMA:
 {
@@ -150,12 +150,19 @@ OUTPUT SCHEMA:
   }
 }
 
-SCORING GUIDE (be generous, use full range):
-- 90-100: Excellent match. Meets most requirements with relevant experience.
-- 80-89: Strong match. Good fit, minor gaps that can be learned.
-- 65-79: Decent match. Has core skills but missing some requirements.
-- 50-64: Partial match. Transferable skills but significant gaps.
-- Below 50: Weak match. Different domain or missing critical requirements.
+SCORING GUIDE (BE STRICT - most candidates should score 40-65):
+- 90-100: RARE. Near-perfect match. Direct experience at similar tier company, meets ALL must-have requirements, has most nice-to-haves. Reserve for exceptional fits only.
+- 80-89: UNCOMMON. Strong match with relevant domain experience. Meets 90%+ of must-haves. Missing 1-2 minor requirements at most.
+- 65-79: AVERAGE. Meets 70-80% of requirements. Has transferable skills but lacks some key experience. Realistic for most applications.
+- 50-64: BELOW AVERAGE. Missing multiple must-have requirements. Has some relevant skills but significant gaps in experience or domain.
+- 35-49: WEAK. Missing critical requirements. Different domain or seniority level mismatch.
+- Below 35: POOR FIT. Fundamentally misaligned with role requirements.
+
+STRICT SCORING RULES:
+1. PENALIZE MISSING MUST-HAVES: Each missing "must-have" requirement = -10 to -15 points.
+2. COMPANY TIER MATTERS: FAANG/top-tier roles require top-tier experience. Penalize if candidate lacks comparable company experience.
+3. YEARS OF EXPERIENCE: If JD requires 5+ years and candidate has 2, that's a major gap (-15 points).
+4. DON'T INFLATE: A score of 82% means "very likely to get an interview." Be realistic about that bar.
 
 TONE: Clinical, direct. Use technical metaphors (exploit, vector, patch, dependency).
 

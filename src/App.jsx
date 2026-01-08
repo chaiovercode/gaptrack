@@ -237,6 +237,40 @@ function App() {
     }
   }
 
+  const handleReanalyzeAll = async () => {
+    if (!data?.resume || !data?.applications?.length) {
+      alert('No resume or jobs to analyze')
+      return
+    }
+
+    const jobsWithJD = data.applications.filter(app => app.parsedJD)
+    if (jobsWithJD.length === 0) {
+      alert('No jobs with parsed JD to re-analyze')
+      return
+    }
+
+    const updatedApps = [...data.applications]
+    let processed = 0
+
+    for (const app of jobsWithJD) {
+      const idx = updatedApps.findIndex(a => a.id === app.id)
+      if (idx === -1) continue
+
+      const result = await analyzeGap(data.resume, app.parsedJD)
+      if (result.success) {
+        updatedApps[idx] = {
+          ...updatedApps[idx],
+          gapAnalysis: result.data,
+          updatedAt: new Date().toISOString()
+        }
+        processed++
+      }
+    }
+
+    await updateAndSave('applications', updatedApps)
+    alert(`Re-analyzed ${processed} of ${jobsWithJD.length} jobs with new scoring`)
+  }
+
   // --- Views ---
 
   if (isLoading) {
@@ -347,6 +381,8 @@ function App() {
             onDeleteJob={handleDeleteJob}
             onEditJob={(job) => { setEditingJob(job); setShowAddAppModal(true); }}
             onUpdateJob={handleUpdateJob}
+            onReanalyzeAll={handleReanalyzeAll}
+            isReanalyzing={aiProcessing}
           />
         } />
 
